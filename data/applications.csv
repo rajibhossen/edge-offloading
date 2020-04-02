@@ -1,0 +1,9 @@
+type_of_application	number_of_CPU_cycles_for_1_bit_data	popularity	min_amount_of_data	max_amount_of_data
+speech_recognition	10435	0.25	80000	800000
+natural_language_processing	25346	0.1	300	1400
+face_recognition	45043	0.1	300000	30000000
+search_request	8405	0.15	400	700
+translation_language	34252	0.1	300	4000
+3d_game_processing	54633	0.1	100000	3000000
+virtual_reality	40305	0.1	100000	3000000
+augmented_reality	34532	0.1	100000	3000000

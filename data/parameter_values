@@ -1,0 +1,30 @@
+
+1. data_size_choice = [300000, 350000, 400000, 450000, 500000] # choose any data size from this range
+2. cpu cycle per bit of data  = 10435  # cpu cycle required for 1 bit of data
+[from a paper]
+
+3. effective switched capacitance: 1e-27,  # used for calculating battery uses in mobile for local procesing
+[from a paper]
+
+4. edge cost/hour: 0.01,  # money per hour in edge server
+5. cloud cost/hour: 0.001,  # money per hour in cloud
+
+6. transmission power : 1.865,  # transmission power of mobile device in W, 1865mW [paper]
+7. tail energy : 1,  # tail energy in J
+
+8. mobile processing capability: 1e9,  # 1 GHz processor speed, 1e9 cpu cycle per second
+9. edge processing capability: 3.4e9,  # 3.4 GHz processor speed
+10. cloud processing capability : 5e9,  # cloud computing capability 4 GHZ processor speed
+
+11. maximum penalty: -10,  # maximum penalty if violates constraint
+12. total energy: 342   # in J, energy = watt * voltage = wh, 3110 mah * 110V
+
+13. mobile resource availability : [0.6, 0.7, 0.8] #random choice from these values, this will be multiplied with total processing power
+14. edge resource availability: [0.6, 0.7, 0.8]  #random choice from these values
+15. cloud allocated resource : [0.6, 0.7, 0.8]  #random choice from these values
+16. energy choice in each new task: [342, 300, 250, 200, 150, 100, 50] chooses randomly
+
+17. uplink rate : [7-16] # choose a random number between this range in Mega bit per sec.
+18. cloud latency: from the dataset
+
+
