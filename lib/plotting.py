@@ -60,7 +60,7 @@ def plot_value_function(V, title="Value Function"):
     plot_surface(X, Y, Z_ace, "{} (Usable Ace)".format(title))
 
 
-def plot_episode_stats(stats, smoothing_window=10, noshow=False):
+def plot_episode_stats(stats, smoothing_window=10, noshow=False, filename="episode"):
     # Plot the episode length over time
     fig1 = plt.figure(figsize=(10, 5))
     plt.plot(stats.episode_lengths)
@@ -70,8 +70,8 @@ def plot_episode_stats(stats, smoothing_window=10, noshow=False):
     if noshow:
         plt.close(fig1)
     else:
-        #plt.show(fig1)
-        plt.savefig("plots/episode_length.png")
+        # plt.show(fig1)
+        plt.savefig("plots/" + filename + "_length.png")
         plt.show()
 
     # Plot the episode reward over time
@@ -84,9 +84,9 @@ def plot_episode_stats(stats, smoothing_window=10, noshow=False):
     if noshow:
         plt.close(fig2)
     else:
-        plt.savefig("plots/episode_reward.png")
+        plt.savefig("plots/" + filename + "_reward.png")
         plt.show()
-        #plt.show(fig2)
+        # plt.show(fig2)
 
     # Plot time steps and episode number
     fig3 = plt.figure(figsize=(10, 5))
@@ -97,8 +97,8 @@ def plot_episode_stats(stats, smoothing_window=10, noshow=False):
     if noshow:
         plt.close(fig3)
     else:
-        plt.savefig("plots/episode_per_tstamp.png")
+        plt.savefig("plots/" + filename + "_per_tstamp.png")
         plt.show()
-        #plt.show(fig3)
+        # plt.show(fig3)
 
     return fig1, fig2, fig3

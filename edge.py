@@ -11,16 +11,16 @@ class Edge:
         self.execution_cap = execution_cap * parameter["edge_com_cap"]
         self.price = parameter["cph_edge"]
 
-    def cal_transmit_time(self, task):
-        tr_time = task['data'] / self.uplink_rate
+    def cal_transmit_time(self, data):
+        tr_time = data / self.uplink_rate
         return tr_time
 
-    def cal_transmit_energy(self, task):
-        tr_energy = self.tr_power * self.cal_transmit_time(task) + self.tail_latency_energy * self.tail_duration
+    def cal_transmit_energy(self, data):
+        tr_energy = self.tr_power * self.cal_transmit_time(data) + self.tail_latency_energy * self.tail_duration
         return tr_energy
 
-    def cal_processing_time(self, task):
-        proc_time = task["cpu_cycle"] / self.execution_cap
+    def cal_processing_time(self, cpu_cycle):
+        proc_time = cpu_cycle / self.execution_cap
         proc_time = proc_time  # in s
         return proc_time
 
@@ -28,10 +28,10 @@ class Edge:
         expense = proc_time * self.price
         return expense
 
-    def cal_total_cost(self, task, weight, energy_factor):
-        tr_time = self.cal_transmit_time(task)
-        proc_time = self.cal_processing_time(task)
-        energy = self.cal_transmit_energy(task)
+    def cal_total_cost(self, data, cpu_cycle, weight, energy_factor):
+        tr_time = self.cal_transmit_time(data)
+        proc_time = self.cal_processing_time(cpu_cycle)
+        energy = self.cal_transmit_energy(data)
         money = self.cal_price(proc_time)
         time = tr_time + proc_time
         energy_impact = energy + energy * energy_factor
@@ -40,9 +40,9 @@ class Edge:
 
 
 if __name__ == '__main__':
-    edge = Edge(15000000, 0.8)
+    edge = Edge(7000000, 1)
     task = get_fixed_task()
-    print("transmit energy: ", edge.cal_transmit_energy(task))
-    print("transmit time: ", edge.cal_transmit_time(task))
+    print("transmit energy: ", edge.cal_transmit_energy(task['data']))
+    print("transmit time: ", edge.cal_transmit_time(task['data']))
     # print(edge.cal_transmit_time(task) + edge.cal_processing_time(task))
-    print(edge.cal_total_cost(task, 0.5, 0))
+    print(edge.cal_total_cost(task['data'], task['cpu_cycle'], 0.5, 0))

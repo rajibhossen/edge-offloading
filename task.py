@@ -11,25 +11,25 @@ import numpy as np
 #     [6, 34532, 100000, 3000000, 40],  # augmented reality
 # ]
 applications = [
-    [0, 10435, 80000, 800000, 10],  # speech recognition
-    [1, 25346, 300, 1400, 1],  # natural language processing
-    [2, 45043, 300000, 30000000, 400],  # face recognition
-    [3, 34252, 300, 4000, 0.5],  # language translation
-    [4, 54633, 100000, 3000000, 80],  # 3d game processing
-    [5, 40305, 100000, 3000000, 70],  # virtual reality
-    [6, 34532, 100000, 3000000, 70],  # augmented reality
+    [0, 10435, 80000, 800000, 8],  # speech recognition
+    [1, 25346, 300, 1400, 1.5],  # natural language processing
+    [2, 45043, 300000, 30000000, 500],  # face recognition
+    [3, 34252, 300, 4000, 1],  # language translation
+    [4, 54633, 100000, 3000000, 100],  # 3d game processing
+    [5, 40305, 100000, 3000000, 80],  # virtual reality
+    [6, 34532, 100000, 3000000, 80],  # augmented reality
 ]
 
 
 def get_random_task():
     choiche = np.random.choice(len(applications))
     application = applications[choiche]
-    data_size = application[2] + application[3] / 2.0
+    data_size = (application[2] + application[3]) / 2.0
     cpu_cycle = data_size * application[1]
     task = {
         "data": data_size,
         "cpu_cycle": cpu_cycle,
-        "delay_tolerance": application[4]
+        "dt": application[4]
     }
     return task
 
@@ -40,7 +40,7 @@ def make_task_from_applications(application):
     task = {
         "data": data_size,
         "cpu_cycle": cpu_cycle,
-        "delay_tolerance": application[4]
+        "dt": application[4]
     }
     return task
 
@@ -63,11 +63,11 @@ def make_task_from_applications(application):
 
 
 def get_fixed_task():
-    size = 2300
+    size = 300000
     task = {
-        "data": size,
-        "cpu_cycle": size * 25346,
-        "delay_tolerance": 0.1
+        "data": 15150000,
+        "cpu_cycle": 682401450000,
+        "dt": 500
     }
     return task
 

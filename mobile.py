@@ -7,26 +7,26 @@ class Mobile:
         self.esc = parameter["esc"]  # effective switched capacitance
         self.computing_capability = parameter['mobile_com_cap'] * mobile_cap
 
-    def calculate_time(self, task):
-        time = task['cpu_cycle'] / self.computing_capability
+    def calculate_time(self, cpu_cycle):
+        time = cpu_cycle / self.computing_capability
         return time  # in s
 
-    def calculate_energy(self, task):
-        energy = self.esc * self.computing_capability ** 2 * task['cpu_cycle']
+    def calculate_energy(self, cpu_cycle):
+        energy = self.esc * (self.computing_capability ** 2) * cpu_cycle
         return energy
 
-    def calculate_total_cost(self, task, weight, energy_factor):
-        time = self.calculate_time(task)
-        energy = self.calculate_energy(task)
+    def calculate_total_cost(self, cpu_cycle, weight, energy_factor):
+        time = self.calculate_time(cpu_cycle)
+        energy = self.calculate_energy(cpu_cycle)
         energy_impact = energy + energy * energy_factor
         total = (1 - weight) * time + weight * energy_impact
         return total, time, energy
 
 
 if __name__ == '__main__':
-    mobile = Mobile(0.8)
+    mobile = Mobile(1)
 
     task = task.get_fixed_task()
-    print("energy: ", mobile.calculate_energy(task))
-    print("processing time: ", mobile.calculate_time(task))
-    print(mobile.calculate_total_cost(task, 0.6, 0))
+    print("energy: ", mobile.calculate_energy(task['cpu_cycle']))
+    print("processing time: ", mobile.calculate_time(task['cpu_cycle']))
+    print(mobile.calculate_total_cost(task['cpu_cycle'], 0.5, 0))
