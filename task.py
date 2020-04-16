@@ -2,6 +2,7 @@ import numpy as np
 
 # [name, cpu cycle for 1 bit, min data, maximum data]
 # applications = [
+#       [id, cpu cycle, min data, max data, delay tolerance]
 #     [0, 10435, 80000, 800000, 5],  # speech recognition
 #     [1, 25346, 300, 1400, 0.5],  # natural language processing
 #     [2, 45043, 300000, 30000000, 300],  # face recognition
@@ -13,7 +14,7 @@ import numpy as np
 applications = [
     [0, 10435, 80000, 800000, 8],  # speech recognition
     [1, 25346, 300, 1400, 1.5],  # natural language processing
-    [2, 45043, 300000, 30000000, 500],  # face recognition
+    # [2, 45043, 300000, 30000000, 500],  # face recognition
     [3, 34252, 300, 4000, 1],  # language translation
     [4, 54633, 100000, 3000000, 100],  # 3d game processing
     [5, 40305, 100000, 3000000, 80],  # virtual reality
@@ -22,8 +23,8 @@ applications = [
 
 
 def get_random_task():
-    choiche = np.random.choice(len(applications))
-    application = applications[choiche]
+    choice = np.random.choice(len(applications))
+    application = applications[choice]
     data_size = (application[2] + application[3]) / 2.0
     cpu_cycle = data_size * application[1]
     task = {

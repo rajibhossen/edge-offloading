@@ -15,6 +15,7 @@ MAX_EPSILON = 1  # not a constant, going to be decayed
 EPSILON_DECAY = 0.99975
 MIN_EPSILON = 0.1
 GAMMA = 0.9
+LEARNING_RATE = 0.0001
 MODEL_NAME = "DQN-TF"
 ep_rewards = [-1200]
 AGGREGATE_STATS_EVERY = 50  # episodes
@@ -23,7 +24,7 @@ EPISODES = 50000
 # For more repetitive results
 random.seed(1)
 np.random.seed(1)
-tf.set_random_seed(1)
+tf.compat.v1.set_random_seed(1)
 
 
 # Own Tensorboard class
@@ -76,15 +77,15 @@ class Model:
         self.tensorboard = ModTensorBoard(log_dir="logs/{}-{}".format(MODEL_NAME, int(time.time())))
 
     def _define_model(self):
-        self._states = tf.placeholder(shape=[None, self._num_states], dtype=tf.float64)
-        self._q_s_a = tf.placeholder(shape=[None, self._num_actions], dtype=tf.float32)
+        self._states = tf.compat.v1.placeholder(shape=[None, self._num_states], dtype=tf.float64)
+        self._q_s_a = tf.compat.v1.placeholder(shape=[None, self._num_actions], dtype=tf.float32)
         # create a couple of fully connected hidden layers
         fc1 = tf.layers.dense(self._states, 50, activation=tf.nn.relu)
         fc2 = tf.layers.dense(fc1, 50, activation=tf.nn.relu)
         self._logits = tf.layers.dense(fc2, self._num_actions)
-        loss = tf.losses.mean_squared_error(self._q_s_a, self._logits)
-        self._optimizer = tf.train.AdamOptimizer(learning_rate=0.001).minimize(loss)
-        self._var_init = tf.global_variables_initializer()
+        loss = tf.compat.v1.losses.mean_squared_error(self._q_s_a, self._logits)
+        self._optimizer = tf.compat.v1.train.AdamOptimizer(learning_rate=LEARNING_RATE).minimize(loss)
+        self._var_init = tf.compat.v1.global_variables_initializer()
 
     def predict_one(self, state, sess):
         return sess.run(self._logits, feed_dict={self._states: state.reshape(1, self._num_states)})
@@ -147,6 +148,7 @@ class GameRunner:
                 stats.episode_rewards[episode] += reward
                 stats.episode_lengths[episode] = step
 
+                # print(state,action, reward)
                 # None for storage sake
                 if done:
                     next_state = None
@@ -178,7 +180,7 @@ class GameRunner:
                 min_reward = min(ep_rewards[-AGGREGATE_STATS_EVERY:])
                 max_reward = max(ep_rewards[-AGGREGATE_STATS_EVERY:])
                 self._model.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward,
-                                                     reward_max=max_reward,reward_per_ep=tot_reward,
+                                                     reward_max=max_reward, reward_per_ep=tot_reward,
                                                      epsilon=self._eps)
 
             print("Episode {}, Step {}, Total reward: {}, Eps: {}".format(episode, self._steps, tot_reward, self._eps))
@@ -248,9 +250,9 @@ if __name__ == "__main__":
         #         #     cnt += 1
         gr.run()
         plt.plot(gr._reward_store)
-        plt.show()
+        # plt.show()
         # plt.close("all")
 
-        # plotting.plot_episode_stats(stats, filename="dqn_b1024")
+        plotting.plot_episode_stats(stats, filename="dqn_n_b1024")
         # plt.plot(gr._max_x_store)
-        # plt.show()
+        plt.show()

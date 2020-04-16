@@ -1,5 +1,5 @@
 import copy
-import logging
+from math import ceil
 
 import gym
 
@@ -16,10 +16,8 @@ class Environment(gym.Env):
         self.n_actions = len(self.action_space)
         self.state = np.zeros(7)
         self.weight = 0.5
-        self.cloud_cap = parameter["cloud_cap"]
         self.total_energy = parameter["total_energy"]
         self.threshold_energy = 10
-        logging.basicConfig(filename="data/offloading.log", level=logging.DEBUG)
 
     def reset(self):
         self.state = get_initial_state()
@@ -47,10 +45,11 @@ class Environment(gym.Env):
             computing_cost, execution_delay, energy_used = edge.cal_total_cost(data, cpu_cycle, self.weight,
                                                                                energy_factor)
         else:
-            cloud = Cloud(uplink_rate, self.cloud_cap)
+            cloud = Cloud(uplink_rate)
             computing_cost, execution_delay, energy_used = cloud.cal_total_cost(data, cpu_cycle, self.weight,
                                                                                 energy_factor)
 
+        energy_used = ceil(energy_used)
         energy_left = energy_left - energy_used
         # if self.energy_left < 5:
         #     self.state[0] = -1

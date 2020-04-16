@@ -1,41 +1,44 @@
 '''
 courtesy: https://pythonprogramming.net/training-deep-q-learning-dqn-reinforcement-learning-python-tutorial/?completed=/deep-q-learning-dqn-reinforcement-learning-python-tutorial/
 '''
-import numpy as np
-import keras.backend.tensorflow_backend as backend
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Conv2D, MaxPooling2D, Activation, Flatten
-from keras.optimizers import Adam
-from keras.callbacks import TensorBoard
-from keras.models import load_model
-import tensorflow as tf
-from collections import deque
-import time
+import csv
+import itertools
+import os
 import random
+import time
+from collections import deque
 
+import numpy as np
+import tensorflow as tf
+from keras.callbacks import TensorBoard
+from keras.layers import Dense, LSTM
+from keras.models import Sequential
+from keras.models import load_model
+from keras.optimizers import Adam
 from keras.utils import normalize
 from tqdm import tqdm
-import os
-from PIL import Image
-import cv2
+
 from environment import Environment
+from lib import plotting
 
 DISCOUNT = 0.99
-REPLAY_MEMORY_SIZE = 400000  # How many last steps to keep for model training
+REPLAY_MEMORY_SIZE = 40000  # How many last steps to keep for model training
 MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
 MODEL_NAME = 'mec-dqn'
-MIN_REWARD = -1200  # For model save
+MIN_REWARD = -200  # For model save
 MEMORY_FRACTION = 0.20
+LEARNING_RATE = 0.001
+
 
 # Environment settings
-EPISODES = 500
+EPISODES = 40000
 
 # Exploration settings
 epsilon = 1  # not a constant, going to be decayed
 EPSILON_DECAY = 0.99975
-MIN_EPSILON = 0.001
+MIN_EPSILON = 0.01
 
 #  Stats settings
 AGGREGATE_STATS_EVERY = 50  # episodes
@@ -55,9 +58,16 @@ tf.set_random_seed(1)
 # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=MEMORY_FRACTION)
 # backend.set_session(tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)))
 
+filename = "data/dqn-q-values.csv"
 # Create models folder
 if not os.path.isdir('models'):
     os.makedirs('models')
+
+
+def csv_writer(row):
+    with open(filename, 'a+') as file:
+        writer = csv.writer(file)
+        writer.writerow(row)
 
 
 # Own Tensorboard class
@@ -95,7 +105,7 @@ class ModifiedTensorBoard(TensorBoard):
 
 # Agent class
 class DQNAgent:
-    def __init__(self, state_size, action_size, model_file='models/mec-dqn.model'):
+    def __init__(self, state_size, action_size, model_file='models/' + MODEL_NAME + '.model'):
         self.n_states = state_size
         self.n_actions = action_size
 
@@ -121,15 +131,17 @@ class DQNAgent:
 
     def create_model(self):
         model = Sequential()
+
         model.add(Dense(50, activation='relu', input_shape=(7,)))
-        # model.add(Dense(50, activation='relu'))
+        # model.add(LSTM(50, activation='relu'))
+
         model.add(Dense(50, activation='relu'))
         model.add(Dense(50, activation='relu'))
         # model.add(Flatten())
         model.add(Dense(self.n_actions, activation='linear'))  # linear or softmax
         # model = model(states)
 
-        model.compile(loss="mse", optimizer=Adam(lr=0.001), metrics=['accuracy'])
+        model.compile(loss="mse", optimizer=Adam(lr=LEARNING_RATE), metrics=['accuracy'])
         # print(model.summary())
         return model
 
@@ -199,12 +211,19 @@ class DQNAgent:
     def get_qs(self, state):
         # vprint(state.shape)
         predict = self.model.predict(state)
+        csv_writer(predict)
         return predict
 
 
+# RUN program starts here.
 agent = DQNAgent(7, 3)
 print(agent.model.summary())
 # Iterate over episodes
+
+stats = plotting.EpisodeStats(
+    episode_lengths=np.zeros(EPISODES+1),
+    episode_rewards=np.zeros(EPISODES+1))
+
 for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
     # Update tensorboard step every episode
@@ -223,7 +242,7 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
     # Reset flag and start iterating until episode ends
     done = False
-    while not done:
+    for t in itertools.count():
 
         # This part stays mostly the same, the change is to query a model for Q values
         if np.random.random() > epsilon:
@@ -234,14 +253,17 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
             action = np.random.randint(0, env.n_actions)
 
         new_state, reward, done = env.step(action)
-        print(current_state, action, reward)
+        # print(current_state, action, reward)
 
         new_state = np.asarray(new_state)
         new_state = new_state.reshape(1, 7)
         new_state = normalize(new_state)
 
-        # Transform new continous state to new discrete state and count reward
+        # Transform new continuous state to new discrete state and count reward
         episode_reward += reward
+
+        stats.episode_rewards[episode] += reward
+        stats.episode_lengths[episode] = t
 
         if SHOW_PREVIEW and not episode % AGGREGATE_STATS_EVERY:
             env.render()
@@ -252,6 +274,9 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
         current_state = new_state
         step += 1
+
+        if done:
+            break
 
     # Append episode reward to a list and log stats (every given number of episodes)
     ep_rewards.append(episode_reward)
@@ -270,3 +295,5 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
     if epsilon > MIN_EPSILON:
         epsilon *= EPSILON_DECAY
         epsilon = max(MIN_EPSILON, epsilon)
+
+plotting.plot_episode_stats(stats)
