@@ -211,7 +211,7 @@ class DQNAgent:
     def get_qs(self, state):
         # vprint(state.shape)
         predict = self.model.predict(state)
-        csv_writer(predict)
+        # csv_writer(predict)
         return predict
 
 
