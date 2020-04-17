@@ -296,4 +296,4 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         epsilon *= EPSILON_DECAY
         epsilon = max(MIN_EPSILON, epsilon)
 
-plotting.plot_episode_stats(stats, filename="mec-dqn-lr-{}-b{}-rm-40.png".format(LEARNING_RATE, MINIBATCH_SIZE))
+plotting.plot_episode_stats(stats, filename="mec-dqn-lr-0.01-b1024-rm-40k")
