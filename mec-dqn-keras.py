@@ -31,7 +31,6 @@ MIN_REWARD = -200  # For model save
 MEMORY_FRACTION = 0.20
 LEARNING_RATE = 0.001
 
-
 # Environment settings
 EPISODES = 40000
 
@@ -221,8 +220,8 @@ print(agent.model.summary())
 # Iterate over episodes
 
 stats = plotting.EpisodeStats(
-    episode_lengths=np.zeros(EPISODES+1),
-    episode_rewards=np.zeros(EPISODES+1))
+    episode_lengths=np.zeros(EPISODES + 1),
+    episode_rewards=np.zeros(EPISODES + 1))
 
 for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
@@ -296,7 +295,4 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         epsilon *= EPSILON_DECAY
         epsilon = max(MIN_EPSILON, epsilon)
 
-
-
 plotting.plot_episode_stats(stats, filename="mec-dqn-lr-0.01-b1024-rm-40k")
-

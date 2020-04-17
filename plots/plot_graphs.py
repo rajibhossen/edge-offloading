@@ -3,8 +3,8 @@ import plotly.express as px
 import matplotlib.pyplot as plt
 from scipy.ndimage.filters import gaussian_filter1d
 
-df = pd.read_csv('../data/loss-lr-0.001-b1024-rm-40k.csv')
-# df = pd.read_csv('../data/reward_avg-lr-0.001-b1024-rm-40k.csv')
+# df = pd.read_csv('../data/loss-lr-0.01-b1024-rm-40k.csv')
+df = pd.read_csv('../data/reward_avg-lr-0.01-b1024-rm-40k.csv')
 
 # fig = px.line(df, x = 'Step', y = 'Value', title='Loss function')
 x = df['Step']
