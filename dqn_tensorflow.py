@@ -13,13 +13,13 @@ import itertools
 # Exploration settings
 MAX_EPSILON = 1  # not a constant, going to be decayed
 EPSILON_DECAY = 0.99975
-MIN_EPSILON = 0.1
+MIN_EPSILON = 0.01
 GAMMA = 0.9
-LEARNING_RATE = 0.0001
+LEARNING_RATE = 0.001
 MODEL_NAME = "DQN-TF"
 ep_rewards = [-1200]
 AGGREGATE_STATS_EVERY = 50  # episodes
-EPISODES = 50000
+EPISODES = 40000
 
 # For more repetitive results
 random.seed(1)
@@ -228,14 +228,14 @@ if __name__ == "__main__":
 
     num_states = 7
     num_actions = 3
-    num_episodes = 50000
+    num_episodes = 40000
 
     stats = plotting.EpisodeStats(
         episode_lengths=np.zeros(num_episodes),
         episode_rewards=np.zeros(num_episodes))
 
     model = Model(num_states, num_actions, 1024)
-    mem = Memory(400000)
+    mem = Memory(10000)
 
     with tf.Session() as sess:
         sess.run(model._var_init)
@@ -253,6 +253,6 @@ if __name__ == "__main__":
         # plt.show()
         # plt.close("all")
 
-        plotting.plot_episode_stats(stats, filename="dqn_n_b1024")
+        plotting.plot_episode_stats(stats, filename="dqn_tf_b1024")
         # plt.plot(gr._max_x_store)
         plt.show()

@@ -11,7 +11,7 @@ from collections import deque
 import numpy as np
 import tensorflow as tf
 from keras.callbacks import TensorBoard
-from keras.layers import Dense, LSTM
+from keras.layers import Dense, LSTM, Dropout
 from keras.models import Sequential
 from keras.models import load_model
 from keras.optimizers import Adam
@@ -131,11 +131,18 @@ class DQNAgent:
     def create_model(self):
         model = Sequential()
 
+        # model.add(LSTM(50, return_sequences=True, input_shape=(None, 7,1)))
+        # model.add(Dropout(0.2))
+        # model.add(LSTM(50, return_sequences=True))
+
         model.add(Dense(50, activation='relu', input_shape=(7,)))
+        # model.add(Dense(50, activation='relu'))
         # model.add(LSTM(50, activation='relu'))
 
         model.add(Dense(50, activation='relu'))
         model.add(Dense(50, activation='relu'))
+
+        # model.add(LSTM(50, activation='relu'))
         # model.add(Flatten())
         model.add(Dense(self.n_actions, activation='linear'))  # linear or softmax
         # model = model(states)
@@ -216,7 +223,7 @@ class DQNAgent:
 
 # RUN program starts here.
 agent = DQNAgent(7, 3)
-print(agent.model.summary())
+# print(agent.model.summary())
 # Iterate over episodes
 
 stats = plotting.EpisodeStats(
