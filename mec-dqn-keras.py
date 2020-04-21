@@ -21,15 +21,21 @@ from tqdm import tqdm
 from environment import Environment
 from lib import plotting
 
+os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
+if tf.test.gpu_device_name():
+    print("in gpu")
+else:
+    print("not in gpu")
+
 DISCOUNT = 0.99
-REPLAY_MEMORY_SIZE = 40000  # How many last steps to keep for model training
+REPLAY_MEMORY_SIZE = 400000  # How many last steps to keep for model training
 MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
 MODEL_NAME = 'mec-dqn'
 MIN_REWARD = -200  # For model save
 MEMORY_FRACTION = 0.20
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.01
 
 # Environment settings
 EPISODES = 40000
