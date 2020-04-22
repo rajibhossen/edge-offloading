@@ -35,10 +35,10 @@ UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
 MODEL_NAME = 'mec-dqn'
 MIN_REWARD = -200  # For model save
 MEMORY_FRACTION = 0.20
-LEARNING_RATE = 0.01
+LEARNING_RATE = 0.001
 
 # Environment settings
-EPISODES = 40000
+EPISODES = 10000
 
 # Exploration settings
 epsilon = 1  # not a constant, going to be decayed
@@ -308,4 +308,4 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         epsilon *= EPSILON_DECAY
         epsilon = max(MIN_EPSILON, epsilon)
 
-plotting.plot_episode_stats(stats, filename="mec-dqn-lr-0.01-b1024-rm-10k")
+plotting.plot_episode_stats(stats, filename="mec-dqn-lr-0.001-b1024-rm-10k")
