@@ -27,7 +27,7 @@ def draw_picture(filename):
 
 fig = plt.figure()
 legends = []
-files = glob.glob("../data/loss-*-rm-40k.csv")
+files = glob.glob("../data/loss-lr-0.0001-*.csv")
 for file in files:
     # draw_picture(file)
     df = pd.read_csv(file)
