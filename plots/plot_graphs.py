@@ -27,13 +27,13 @@ def draw_picture(filename):
 
 fig = plt.figure()
 legends = []
-files = glob.glob("../data/loss-lr-0.0001-*.csv")
+files = glob.glob("../data/accuracy-lr-0.001-*.csv")
 for file in files:
     # draw_picture(file)
     df = pd.read_csv(file)
     x = df['Step']
     y = df['Value']
-    ysm = gaussian_filter1d(y, sigma=1.3)
+    ysm = gaussian_filter1d(y, sigma=2)
     lr = re.search('lr-(.+?)-b', file)
     rm = re.search('rm-(.+?)k', file)
     lr = lr.group(1)
@@ -41,7 +41,6 @@ for file in files:
     legends.append(str(lr) + "/" + str(rm))
     # plt.legend("lr-" + str(m.group(1)))
     plt.plot(x, ysm)
-
 plt.legend(legends)
 plt.xlabel("Episodes")
 plt.ylabel("Value")
