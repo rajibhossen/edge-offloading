@@ -12,36 +12,37 @@ import numpy as np
 #     [6, 34532, 100000, 3000000, 40],  # augmented reality
 # ]
 applications = [
-    [0, 10435, 80000, 800000, 8],  # speech recognition
-    [1, 25346, 300, 1400, 1.5],  # natural language processing
-    # [2, 45043, 300000, 30000000, 500],  # face recognition
-    [3, 34252, 300, 4000, 1],  # language translation
-    [4, 54633, 100000, 3000000, 100],  # 3d game processing
-    [5, 40305, 100000, 3000000, 80],  # virtual reality
-    [6, 34532, 100000, 3000000, 80],  # augmented reality
+    [0, 10435, 440000.0, 8],  # speech recognition
+    [1, 25346, 850.0, 1.5],  # natural language processing, newly added
+    [2, 45043, 15150000, 500],  # face recognition
+    [3, 34252, 2150.0, 1],  # language translation
+    [4, 54633, 1550000.0, 100],  # 3d game processing
+    [5, 40305, 1550000.0, 80],  # virtual reality
+    [6, 34532, 1550000.0, 70],  # augmented reality
+    [7, 100, 15500000.0, 20], # fabricated task, newly added
 ]
 
 
 def get_random_task():
     choice = np.random.choice(len(applications))
     application = applications[choice]
-    data_size = (application[2] + application[3]) / 2.0
+    data_size = application[2]
     cpu_cycle = data_size * application[1]
     task = {
         "data": data_size,
         "cpu_cycle": cpu_cycle,
-        "dt": application[4]
+        "dt": application[3]
     }
     return task
 
 
 def make_task_from_applications(application):
-    data_size = (application[2] + application[3]) / 2.0
+    data_size = application[2]
     cpu_cycle = data_size * application[1]
     task = {
         "data": data_size,
         "cpu_cycle": cpu_cycle,
-        "dt": application[4]
+        "dt": application[3]
     }
     return task
 
@@ -66,9 +67,9 @@ def make_task_from_applications(application):
 def get_fixed_task():
     size = 300000
     task = {
-        "data": 15150000,
-        "cpu_cycle": 682401450000,
-        "dt": 500
+        "data": 15500000,
+        "cpu_cycle": 1550000000,
+        "dt": 100
     }
     return task
 
@@ -77,4 +78,4 @@ if __name__ == '__main__':
     # task = create_task()
     # print(task["cpu_cycle"] / 3.6)
     for i in range(20):
-        get_random_task()
+        print(get_random_task())

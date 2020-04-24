@@ -26,23 +26,25 @@ def draw_picture(filename):
 
 
 fig = plt.figure()
-legends = []
-files = glob.glob("../data/accuracy-lr-0.001-*.csv")
+# legends = []
+# files = glob.glob("../data/reward-lr-0.001-*.csv")
+files = ['../data/reward_avg-lr-0.001-b1024-rm-10k.csv', '../data/all-mobile-avg-reward.csv', '../data/all-edge-avg-reward.csv', '../data/all-cloud-avg-reward.csv']
+legends = ['DQN', 'Mobile', 'Edge', 'Cloud']
 for file in files:
     # draw_picture(file)
     df = pd.read_csv(file)
     x = df['Step']
     y = df['Value']
-    ysm = gaussian_filter1d(y, sigma=2)
-    lr = re.search('lr-(.+?)-b', file)
-    rm = re.search('rm-(.+?)k', file)
-    lr = lr.group(1)
-    rm = rm.group(1)
-    legends.append(str(lr) + "/" + str(rm))
-    # plt.legend("lr-" + str(m.group(1)))
+    ysm = gaussian_filter1d(y, sigma=1.3)
+    # lr = re.search('lr-(.+?)-b', file)
+    # rm = re.search('rm-(.+?)k', file)
+    # lr = lr.group(1)
+    # rm = rm.group(1)
+    # legends.append(str(lr) + "/" + str(rm))
+    # # plt.legend("lr-" + str(m.group(1)))
     plt.plot(x, ysm)
 plt.legend(legends)
 plt.xlabel("Episodes")
 plt.ylabel("Value")
-plt.title("Loss function")
+plt.title("Average function")
 plt.show()
