@@ -38,7 +38,7 @@ MEMORY_FRACTION = 0.20
 LEARNING_RATE = 0.001
 
 # Environment settings
-EPISODES = 40000
+EPISODES = 10
 
 # Exploration settings
 epsilon = 1  # not a constant, going to be decayed
@@ -63,7 +63,7 @@ tf.set_random_seed(1)
 # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=MEMORY_FRACTION)
 # backend.set_session(tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)))
 
-filename = "data/dqn-q-values.csv"
+filename = "data/dqn-step-actions.csv"
 # Create models folder
 if not os.path.isdir('models'):
     os.makedirs('models')
@@ -72,7 +72,7 @@ if not os.path.isdir('models'):
 def csv_writer(row):
     with open(filename, 'a+') as file:
         writer = csv.writer(file)
-        writer.writerow(row)
+        writer.writerows(row)
 
 
 # Own Tensorboard class
@@ -236,6 +236,8 @@ stats = plotting.EpisodeStats(
     episode_lengths=np.zeros(EPISODES + 1),
     episode_rewards=np.zeros(EPISODES + 1))
 
+total_step = 1
+step_actions = []
 for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
     # Update tensorboard step every episode
@@ -271,6 +273,7 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         new_state = new_state.reshape(1, 7)
         new_state = normalize(new_state)
 
+        step_actions.append([total_step, action])
         # Transform new continuous state to new discrete state and count reward
         episode_reward += reward
 
@@ -286,7 +289,7 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
         current_state = new_state
         step += 1
-
+        total_step += 1
         if done:
             break
 
@@ -307,5 +310,5 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
     if epsilon > MIN_EPSILON:
         epsilon *= EPSILON_DECAY
         epsilon = max(MIN_EPSILON, epsilon)
-
+csv_writer(step_actions)
 plotting.plot_episode_stats(stats, filename="mec-dqn-lr-0.001-b1024-rm-10k")
