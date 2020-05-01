@@ -33,12 +33,12 @@ MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start tr
 MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
 MODEL_NAME = 'mec-dqn'
-MIN_REWARD = -200  # For model save
+MIN_REWARD = -500  # For model save
 MEMORY_FRACTION = 0.20
 LEARNING_RATE = 0.001
 
 # Environment settings
-EPISODES = 10
+EPISODES = 40000
 
 # Exploration settings
 epsilon = 1  # not a constant, going to be decayed
