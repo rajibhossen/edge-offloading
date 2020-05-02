@@ -1,34 +1,33 @@
-import re
-
-import pandas as pd
-import plotly.express as px
 import matplotlib.pyplot as plt
+import pandas as pd
 from scipy.ndimage.filters import gaussian_filter1d
-import glob
 
 
 def draw_picture(filename):
     # df = pd.read_csv('../data/loss-lr-0.01-b1024-rm-40k.csv')
     df = pd.read_csv(filename)
-
+    print(df.groupby(['Value']).size())
     # fig = px.line(df, x = 'Step', y = 'Value', title='Loss function')
-    x = df['Step']
-    y = df['Value']
-    ysm = gaussian_filter1d(y, sigma=1.3)
+    # x = df['Step']
+    # y = df['Value']
+    # ysm = gaussian_filter1d(y, sigma=1.3)
+    #
+    # plt.plot(x, ysm)
+    # plt.xlabel("Steps")
+    # plt.ylabel("Action")
+    # plt.title("Loss function")
+    # # plt.ylabel("Average Reward")
+    # # plt.title("Average Reward Over Episodes")
+    # plt.show()
 
-    plt.plot(x, ysm)
-    plt.xlabel("Episodes")
-    plt.ylabel("Value")
-    plt.title("Loss function")
-    # plt.ylabel("Average Reward")
-    # plt.title("Average Reward Over Episodes")
-    plt.show()
 
+draw_picture("../data/dqn-step-actions.csv")
 
 fig = plt.figure()
 # legends = []
 # files = glob.glob("../data/reward-lr-0.001-*.csv")
-files = ['../data/reward_avg-lr-0.001-b1024-rm-10k.csv', '../data/all-mobile-avg-reward.csv', '../data/all-edge-avg-reward.csv', '../data/all-cloud-avg-reward.csv']
+files = ['../data/reward_avg-lr-0.001-b1024-rm-10k.csv', '../data/all-mobile-avg-reward.csv',
+         '../data/all-edge-avg-reward.csv', '../data/all-cloud-avg-reward.csv']
 legends = ['DQN', 'Mobile', 'Edge', 'Cloud']
 for file in files:
     # draw_picture(file)
