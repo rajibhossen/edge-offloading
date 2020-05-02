@@ -63,7 +63,7 @@ tf.set_random_seed(1)
 # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=MEMORY_FRACTION)
 # backend.set_session(tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)))
 
-filename = "data/dqn-step-actions-old.csv"
+filename = "data/dqn-step-actions.csv"
 # Create models folder
 if not os.path.isdir('models'):
     os.makedirs('models')
