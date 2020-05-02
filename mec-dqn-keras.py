@@ -63,7 +63,7 @@ tf.set_random_seed(1)
 # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=MEMORY_FRACTION)
 # backend.set_session(tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)))
 
-filename = "data/dqn-step-actions.csv"
+filename = "data/dqn-step-actions-old.csv"
 # Create models folder
 if not os.path.isdir('models'):
     os.makedirs('models')
@@ -236,7 +236,6 @@ stats = plotting.EpisodeStats(
     episode_lengths=np.zeros(EPISODES + 1),
     episode_rewards=np.zeros(EPISODES + 1))
 
-total_step = 1
 step_actions = []
 for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
@@ -246,6 +245,8 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
     # Restarting episode - reset episode reward and step number
     episode_reward = 0
     step = 1
+
+    episode_action = []
 
     # Reset environment and get initial state
     current_state = env.reset()
@@ -273,7 +274,8 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         new_state = new_state.reshape(1, 7)
         new_state = normalize(new_state)
 
-        step_actions.append([total_step, action])
+        #for avg action per episode
+        episode_action.append(action)
         # Transform new continuous state to new discrete state and count reward
         episode_reward += reward
 
@@ -289,10 +291,10 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
         current_state = new_state
         step += 1
-        total_step += 1
+
         if done:
             break
-
+    step_actions.append([episode,sum(episode_action) / len(episode_action)])
     # Append episode reward to a list and log stats (every given number of episodes)
     ep_rewards.append(episode_reward)
     if not episode % AGGREGATE_STATS_EVERY or episode == 1:
