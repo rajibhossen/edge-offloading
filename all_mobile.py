@@ -16,7 +16,7 @@ matplotlib.style.use('ggplot')
 ep_rewards = []
 AGGREGATE_STATS_EVERY = 50  # episodes
 
-filename = "data/all-cloud-avg-reward.csv"
+filename = "data/all-edge-avg-reward.csv"
 with open(filename, "a+") as avg_reward:
     csv_writer = csv.writer(avg_reward, delimiter=",")
     csv_writer.writerow(['Step', 'Value'])
@@ -35,7 +35,7 @@ def update(env, episodes=40000):
         state = env.reset()
         for t in itertools.count():
             print("Episode [%d] Iteration: %d" % (episode, t))
-            action = 2
+            action = 1
             state_, reward, done = env.step(action)
             print(state,reward)
             stats.episode_rewards[episode] += reward
