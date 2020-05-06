@@ -21,7 +21,7 @@ def draw_picture(filename):
     # plt.show()
 
 
-draw_picture("../data/dqn-step-actions.csv")
+draw_picture("../data/dqn-episode-actions.csv")
 
 fig = plt.figure()
 # legends = []
