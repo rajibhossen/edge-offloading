@@ -253,6 +253,6 @@ if __name__ == "__main__":
         # plt.show()
         # plt.close("all")
 
-        plotting.plot_episode_stats(stats, filename="dqn_tf_b1024")
+        plotting.plot_episode_stats(stats, filename="dqn=tf-lr-0.0001-b1024-rm-10k")
         # plt.plot(gr._max_x_store)
         plt.show()

@@ -13,13 +13,13 @@ import numpy as np
 # ]
 applications = [
     [0, 10435, 440000.0, 8],  # speech recognition
-    #[1, 25346, 850.0, 1.5],  # natural language processing, newly added
+    # [1, 25346, 850.0, 1.5],  # natural language processing, newly added
     [2, 45043, 15150000, 500],  # face recognition
     [3, 34252, 2150.0, 1],  # language translation
     [4, 54633, 1550000.0, 100],  # 3d game processing
     [5, 40305, 1550000.0, 80],  # virtual reality
     [6, 34532, 1550000.0, 70],  # augmented reality
-    #[7, 100, 15500000.0, 20], # fabricated task, newly added
+    # [7, 100, 15500000.0, 20], # fabricated task, newly added
 ]
 
 

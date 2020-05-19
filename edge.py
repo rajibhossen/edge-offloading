@@ -52,6 +52,15 @@ class Edge:
             total = (1 - weight) * time + weight * energy_impact + money
             return total, time, energy
 
+    def cal_total_cost_naive(self, data, cpu_cycle, weight):
+        edge_tr_time = self.cal_transmit_time(data)
+        energy = self.cal_transmit_energy(data)
+        proc_time = self.cal_processing_time(cpu_cycle)
+        money = self.cal_price(proc_time)
+        time = edge_tr_time + proc_time
+        total = (1 - weight) * time + weight * energy + money
+        return total, time, energy
+
 
 if __name__ == '__main__':
     edge = Edge(7000000, 0.6)
@@ -64,9 +73,9 @@ if __name__ == '__main__':
     # print("transmit time: ", edge.cal_transmit_time(task['data']))
     # # print(edge.cal_transmit_time(task) + edge.cal_processing_time(task))
     # print(edge.cal_total_cost(task['data'], task['cpu_cycle'], 0.5, 0))
-    for u in range(7,12):
-        u_rate = u*1000000
-        for cap in [0.2,0.4,0.6,0.8,1]:
+    for u in range(7, 12):
+        u_rate = u * 1000000
+        for cap in [0.2, 0.4, 0.6, 0.8, 1]:
             edge = Edge(u_rate, cap)
             job = task.get_fixed_task()
             print(edge.cal_total_cost(job['data'], job['cpu_cycle'], 0.5, 0))

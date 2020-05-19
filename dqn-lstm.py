@@ -32,7 +32,7 @@ REPLAY_MEMORY_SIZE = 10000  # How many last steps to keep for model training
 MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
-MODEL_NAME = 'mec-dqn'
+MODEL_NAME = 'dqn-lstm'
 MIN_REWARD = -500  # For model save
 MEMORY_FRACTION = 0.20
 LEARNING_RATE = 0.001
@@ -109,7 +109,7 @@ class ModifiedTensorBoard(TensorBoard):
 
 
 # Agent class
-class DQNAgent:
+class DQNLSTMAgent:
     def __init__(self, state_size, action_size, model_file='models/' + MODEL_NAME + '.model'):
         self.n_states = state_size
         self.n_actions = action_size
@@ -137,11 +137,15 @@ class DQNAgent:
     def create_model(self):
         model = Sequential()
 
-        model.add(Dense(50, activation='relu', input_shape=(7,)))
+        model.add(Dense(50, activation='relu', input_shape=(1, 7)))
         model.add(Dense(50, activation='relu'))
         model.add(Dense(50, activation='relu'))
 
+        # model.add(LSTM(50, dropout=0.2, recurrent_dropout=0.2))
+        model.add(LSTM(50, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
+
         model.add(Dense(self.n_actions, activation='linear'))  # linear or softmax
+        # model = model(states)
 
         model.compile(loss="mse", optimizer=Adam(lr=LEARNING_RATE), metrics=['accuracy'])
         # print(model.summary())
@@ -170,8 +174,16 @@ class DQNAgent:
             current_states[i] = transition[0]
             new_current_states[i] = transition[3]
 
+        # convert to 3D array to get prediction from LSTM module
+        current_states = np.reshape(current_states, (len(current_states), 1, self.n_states))
+        new_current_states = np.reshape(new_current_states, (len(new_current_states), 1, self.n_states))
+
         current_qs_list = self.model.predict(current_states)
         future_qs_list = self.target_model.predict(new_current_states)
+
+        # convert to 2D array for iterating over the values
+        current_qs_list = np.reshape(current_qs_list, (len(current_qs_list), self.n_actions))
+        future_qs_list = np.reshape(future_qs_list, (len(future_qs_list), self.n_actions))
 
         X = np.zeros((len(minibatch), self.n_states))
         y = np.zeros((len(minibatch), self.n_actions))
@@ -195,6 +207,11 @@ class DQNAgent:
             X[index] = current_state
             y[index] = current_qs
 
+        # reshape X and y to compatible with LSTM [batch size, time step, sequence]
+        X = np.reshape(X, (MINIBATCH_SIZE, 1, self.n_states))
+        y = np.reshape(y, (MINIBATCH_SIZE, 1, self.n_actions))
+        # print("Training X: ", X)
+        # print("Training y: ", y.shape)
         # X = np.array(X).reshape(64, 7)
         # Fit on all samples as one batch, log only on terminal state
         self.model.fit(X, y, batch_size=MINIBATCH_SIZE, verbose=0, shuffle=False,
@@ -211,14 +228,17 @@ class DQNAgent:
 
     # Queries main network for Q values given current observation space (environment state)
     def get_qs(self, state):
-        # vprint(state.shape)
+        # print("State for Prediction: ", state)
+        # make 3-D array for LSTM [batch, time step, sequence]
+        state = np.reshape(state, (1, 1, self.n_states))
+        # print("Reshaped State for Prediction: ", state)
         predict = self.model.predict(state)
-        # csv_writer(predict)
+        # print(predict)
         return predict
 
 
 # RUN program starts here.
-agent = DQNAgent(7, 3)
+agent = DQNLSTMAgent(7, 3)
 # print(agent.model.summary())
 # Iterate over episodes
 
@@ -240,9 +260,9 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
     # Reset environment and get initial state
     current_state = env.reset()
     current_state = np.asarray(current_state)
+
     current_state = normalize(current_state)
-    # print(current_state.shape)
-    current_state = current_state.reshape(1,7)
+    current_state = current_state.reshape(1, 7)
 
     # Reset flag and start iterating until episode ends
     done = False
@@ -252,21 +272,17 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         if np.random.random() > epsilon:
             # Get action from Q table
             action = np.argmax(agent.get_qs(current_state))
+            # print(action)
         else:
             # Get random action
             action = np.random.randint(0, env.n_actions)
 
         new_state, reward, done = env.step(action)
-        # print(current_state, action, reward)
 
         new_state = np.asarray(new_state)
         new_state = normalize(new_state)
-        new_state = new_state.reshape(1,7)
+        new_state = new_state.reshape(1, 7)
 
-        # for avg action per episode
-        # step_actions.append([total_step, action])
-        # total_step += 1
-        # Transform new continuous state to new discrete state and count reward
         episode_reward += reward
 
         stats.episode_rewards[episode] += reward
@@ -303,4 +319,4 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         epsilon *= EPSILON_DECAY
         epsilon = max(MIN_EPSILON, epsilon)
 # csv_writer(step_actions)
-plotting.plot_episode_stats(stats, filename="mec-lstm-lr-0.001-b1024-rm-10k")
+plotting.plot_episode_stats(stats, filename="dqn-lstm-lr-0.001-b1024-rm-10k")

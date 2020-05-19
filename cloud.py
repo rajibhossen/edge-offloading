@@ -60,6 +60,15 @@ class Cloud:
         total = (1 - weight) * time + weight * energy_impact + money
         return total, time, energy
 
+    def cal_total_cost_naive(self, data, cpu_cycle, weight):
+        tr_time = self.cal_transmit_time(data)
+        proc_time = self.cal_processing_time(cpu_cycle)
+        energy = self.cal_transmit_energy(data)
+        money = self.cal_price(proc_time)
+        time = tr_time + proc_time
+        total = (1 - weight) * time + weight * energy + money
+        return total, time, energy
+
 
 if __name__ == '__main__':
     cloud = Cloud(7000000)

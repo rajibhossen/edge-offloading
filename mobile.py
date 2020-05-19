@@ -27,6 +27,12 @@ class Mobile:
         total = (1 - weight) * time + weight * energy_impact
         return total, time, energy
 
+    def calculate_cost_naive(self, cpu_cycle, weight):
+        time = self.calculate_time(cpu_cycle)
+        energy = self.calculate_energy(cpu_cycle)
+        total = (1 - weight) * time + weight * energy
+        return total, time, energy
+
 
 if __name__ == '__main__':
     for cap in [0.2, 0.4, 0.6, 0.8, 1]:

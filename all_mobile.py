@@ -7,6 +7,7 @@ import numpy as np
 from lib import plotting
 
 from environment import Environment
+from naive_env import NaiveEnvironment
 from qlearning import QLearningTable
 from pandas import DataFrame
 
@@ -16,7 +17,7 @@ matplotlib.style.use('ggplot')
 ep_rewards = []
 AGGREGATE_STATS_EVERY = 50  # episodes
 
-filename = "data/all-edge-avg-reward.csv"
+filename = "data/all-cloud-avg-reward.csv"
 with open(filename, "a+") as avg_reward:
     csv_writer = csv.writer(avg_reward, delimiter=",")
     csv_writer.writerow(['Step', 'Value'])
@@ -35,9 +36,9 @@ def update(env, episodes=40000):
         state = env.reset()
         for t in itertools.count():
             print("Episode [%d] Iteration: %d" % (episode, t))
-            action = 1
+            action = 2
             state_, reward, done = env.step(action)
-            print(state,reward)
+            # print(state,reward)
             stats.episode_rewards[episode] += reward
             stats.episode_lengths[episode] = t
             total_reward += reward
@@ -53,17 +54,17 @@ def update(env, episodes=40000):
     # print(stats)
 
 
-def save_to_file(data):
-    data_dir = "data/all-mobile-avg-reward.csv"
-    # if not os.path.exists(data_dir):
-    #     os.mkdir(data_dir)
-    DataFrame.to_csv(data, data_dir)
+# def save_to_file(data):
+#     data_dir = "data/all-mobile-avg-reward.csv"
+#     # if not os.path.exists(data_dir):
+#     #     os.mkdir(data_dir)
+#     DataFrame.to_csv(data, data_dir)
 
 
 if __name__ == '__main__':
     num_of_episodes = 40000
 
-    env = Environment()
+    env = NaiveEnvironment()
 
     stats = plotting.EpisodeStats(
         episode_lengths=np.zeros(num_of_episodes + 1),
