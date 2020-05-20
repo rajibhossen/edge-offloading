@@ -38,7 +38,7 @@ MEMORY_FRACTION = 0.20
 LEARNING_RATE = 0.001
 
 # Environment settings
-EPISODES = 4
+EPISODES = 50000
 
 # Exploration settings
 epsilon = 1  # not a constant, going to be decayed
