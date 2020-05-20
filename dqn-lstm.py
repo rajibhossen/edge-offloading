@@ -28,17 +28,17 @@ else:
     print("not in gpu")
 
 DISCOUNT = 0.99
-REPLAY_MEMORY_SIZE = 100000  # How many last steps to keep for model training
+REPLAY_MEMORY_SIZE = 50000  # How many last steps to keep for model training
 MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
-MODEL_NAME = 'dqn-lstm-lr-0.00001-rm-100k'
+MODEL_NAME = 'dqn-lstm-lr-0.001-rm-50k'
 MIN_REWARD = -500  # For model save
 MEMORY_FRACTION = 0.20
-LEARNING_RATE = 0.00001
+LEARNING_RATE = 0.001
 
 # Environment settings
-EPISODES = 40000
+EPISODES = 4
 
 # Exploration settings
 epsilon = 1  # not a constant, going to be decayed
@@ -63,7 +63,7 @@ tf.set_random_seed(1)
 # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=MEMORY_FRACTION)
 # backend.set_session(tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)))
 
-filename = "data/step-actions.csv"
+filename = "data/state-trace.csv"
 # Create models folder
 if not os.path.isdir('models'):
     os.makedirs('models')
@@ -72,7 +72,8 @@ if not os.path.isdir('models'):
 def csv_writer(row):
     with open(filename, 'a+') as file:
         writer = csv.writer(file)
-        writer.writerows(row)
+        for item in row:
+            writer.writerow(eval(item))
 
 
 # Own Tensorboard class
@@ -248,6 +249,7 @@ stats = plotting.EpisodeStats(
 
 # step_actions = []
 # total_step = 1
+total_states = []
 for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
     # Update tensorboard step every episode
@@ -259,6 +261,9 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
     # Reset environment and get initial state
     current_state = env.reset()
+    # print(current_state)
+    total_states.append(str(current_state))
+
     current_state = np.asarray(current_state)
 
     current_state = normalize(current_state)
@@ -278,6 +283,9 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
             action = np.random.randint(0, env.n_actions)
 
         new_state, reward, done = env.step(action)
+
+        if not done:
+            total_states.append(str(new_state))
 
         new_state = np.asarray(new_state)
         new_state = normalize(new_state)
@@ -318,5 +326,8 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
     if epsilon > MIN_EPSILON:
         epsilon *= EPSILON_DECAY
         epsilon = max(MIN_EPSILON, epsilon)
-# csv_writer(step_actions)
-plotting.plot_episode_stats(stats, filename="dqn-lstm-lr-0.001-b1024-rm-100k")
+
+# print(total_states)
+csv_writer(total_states)
+
+plotting.plot_episode_stats(stats, filename="dqn-lstm-lr-0.001-b1024-rm-50k")

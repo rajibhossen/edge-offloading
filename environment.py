@@ -10,6 +10,10 @@ from mobile import Mobile
 
 
 class Environment(gym.Env):
+
+    def render(self, mode='human'):
+        pass
+
     def __init__(self):
         super(Environment, self).__init__()
         self.action_space = ['l', 'e', 'c']
@@ -51,33 +55,7 @@ class Environment(gym.Env):
 
         energy_used = ceil(energy_used)
         energy_left = energy_left - energy_used
-        # if self.energy_left < 5:
-        #     self.state[0] = -1
-        #     self.state[1] = -1
-        #     self.state[2] = -1
-        #     self.state[3] = -1
-        #     self.state[4] = -1
-        #     done = True
-        #     reward = parameter['max_penalty']
-        #     return copy.copy(self.state), reward, done
 
-        # logging.info(str(self.state) + ", " + str(action) + ", " + str(computing_cost) + ", " + str(
-        #     execution_delay) + ", " + str(energy_used))
-        # if self.energy_left < 50:
-        #     reward = parameter['max_penalty']
-        #     done = True
-        #     self.state[0] = -1
-        #     self.state[1] = -1
-        #     self.state[2] = -1
-        #     self.state[3] = -1
-        #     self.state[4] = -1
-        # else:
-        # check battery level and reset
-
-        # if self.energy_left < 50:
-        #     done = True
-        # else:
-        #     done = False
         # scaled_reward = ((m_total - computing_cost) / m_total) * 100.0
         if energy_left < self.threshold_energy:
             # reward = scaled_reward

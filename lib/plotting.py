@@ -71,7 +71,7 @@ def plot_episode_stats(stats, smoothing_window=10, noshow=False, filename="episo
         plt.close(fig1)
     else:
         # plt.show(fig1)
-        plt.savefig("plots/" + filename + "_length.png")
+        #plt.savefig("plots/" + filename + "_length.png")
         plt.show()
 
     # Plot the episode reward over time
@@ -84,7 +84,7 @@ def plot_episode_stats(stats, smoothing_window=10, noshow=False, filename="episo
     if noshow:
         plt.close(fig2)
     else:
-        plt.savefig("plots/" + filename + "_reward.png")
+        #plt.savefig("plots/" + filename + "_reward.png")
         plt.show()
         # plt.show(fig2)
 
@@ -97,7 +97,7 @@ def plot_episode_stats(stats, smoothing_window=10, noshow=False, filename="episo
     if noshow:
         plt.close(fig3)
     else:
-        plt.savefig("plots/" + filename + "_per_tstamp.png")
+        #plt.savefig("plots/" + filename + "_per_tstamp.png")
         plt.show()
         # plt.show(fig3)
 

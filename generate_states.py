@@ -1,3 +1,5 @@
+import itertools
+
 from task import get_random_task
 from system_parameters import parameter
 import random
@@ -38,6 +40,7 @@ def get_initial_state():
     task = get_random_task()
     state = [task['data'], task['cpu_cycle'], task['dt'], uplink_rate, mobile_cap, server_cap, energy]
     return state
+
 
 #
 # def get_state_variables():
