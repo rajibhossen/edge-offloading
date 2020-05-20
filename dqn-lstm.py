@@ -28,14 +28,14 @@ else:
     print("not in gpu")
 
 DISCOUNT = 0.99
-REPLAY_MEMORY_SIZE = 10000  # How many last steps to keep for model training
+REPLAY_MEMORY_SIZE = 100000  # How many last steps to keep for model training
 MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
-MODEL_NAME = 'dqn-lstm'
+MODEL_NAME = 'dqn-lstm-lr-0.00001-rm-100k'
 MIN_REWARD = -500  # For model save
 MEMORY_FRACTION = 0.20
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.00001
 
 # Environment settings
 EPISODES = 40000
@@ -319,4 +319,4 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         epsilon *= EPSILON_DECAY
         epsilon = max(MIN_EPSILON, epsilon)
 # csv_writer(step_actions)
-plotting.plot_episode_stats(stats, filename="dqn-lstm-lr-0.001-b1024-rm-10k")
+plotting.plot_episode_stats(stats, filename="dqn-lstm-lr-0.001-b1024-rm-100k")
