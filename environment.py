@@ -1,4 +1,5 @@
 import copy
+import csv
 from math import ceil
 
 import gym
@@ -75,6 +76,7 @@ class Environment(gym.Env):
             if execution_delay > dt:
                 reward = parameter['max_penalty']
                 # done = False
+                # begin old state assignment
                 task = get_random_task()
                 self.state[0] = task['data']
                 self.state[1] = task['cpu_cycle']
@@ -83,6 +85,7 @@ class Environment(gym.Env):
                 self.state[4] = get_mobile_availability()
                 self.state[5] = get_server_availability()
                 self.state[6] = energy_left
+                # end old state assignment
                 # self.state[6] = get_energy_availability()
             else:
                 # compare with mobile computation and
@@ -100,3 +103,8 @@ class Environment(gym.Env):
                 # self.state[6] = get_energy_availability()
 
         return self.state, reward, done
+
+
+# if __name__ == '__main__':
+#     env = Environment()
+#     # print(env.read_states())

@@ -27,23 +27,23 @@ if tf.test.gpu_device_name():
 else:
     print("not in gpu")
 
-DISCOUNT = 0.99
-REPLAY_MEMORY_SIZE = 50000  # How many last steps to keep for model training
+DISCOUNT = 0.90
+REPLAY_MEMORY_SIZE = 10000  # How many last steps to keep for model training
 MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
-MODEL_NAME = 'dqn-lstm-lr-0.001-rm-50k'
+MODEL_NAME = 'dqn-lstm'
 MIN_REWARD = -500  # For model save
 MEMORY_FRACTION = 0.20
 LEARNING_RATE = 0.001
 
 # Environment settings
-EPISODES = 50000
+EPISODES = 40000
 
 # Exploration settings
 epsilon = 1  # not a constant, going to be decayed
 EPSILON_DECAY = 0.99975
-MIN_EPSILON = 0.05
+MIN_EPSILON = 0.1
 
 #  Stats settings
 AGGREGATE_STATS_EVERY = 50  # episodes
@@ -138,17 +138,15 @@ class DQNLSTMAgent:
     def create_model(self):
         model = Sequential()
 
-        model.add(Dense(50, activation='relu', input_shape=(1, 7)))
-        model.add(Dense(50, activation='relu'))
-        model.add(Dense(50, activation='relu'))
-
-        # model.add(LSTM(50, dropout=0.2, recurrent_dropout=0.2))
+        model.add(Dense(500, activation='relu', input_shape=(1, 7)))
+        # model.add(Dense(50, activation='relu'))
+        # model.add(Dense(50, activation='relu'))
         model.add(LSTM(50, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
-
+        model.add(Dense(50, activation='relu'))
         model.add(Dense(self.n_actions, activation='linear'))  # linear or softmax
         # model = model(states)
 
-        model.compile(loss="mse", optimizer=Adam(lr=LEARNING_RATE), metrics=['accuracy'])
+        model.compile(loss="mean_squared_error", optimizer=Adam(lr=LEARNING_RATE), metrics=['accuracy'])
         # print(model.summary())
         return model
 

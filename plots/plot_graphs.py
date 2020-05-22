@@ -24,41 +24,94 @@ def draw_picture(filename):
 
 # draw_picture("../data/dqn-episode-actions.csv")
 
-sns.set_style("darkgrid")
-fig = plt.figure()
-# legends = []
-# files = glob.glob("../data/reward-lr-0.001-*.csv")
-files = ['../data/reward_avg-dqn-tf.csv', '../data/naive_approach.csv',
-         '../data/all-mobile-avg-reward.csv',
-         '../data/all-edge-avg-reward.csv', '../data/all-cloud-avg-reward.csv']
-legends = ['DQN', 'Naive', 'Mobile', 'Edge', 'Cloud']
+def draw_comparisons():
+    sns.set_style("darkgrid")
+    fig = plt.figure()
+    # legends = []
+    # files = glob.glob("../data/reward-lr-0.001-*.csv")
+    files = ['../data/reward_avg-dqn-tf.csv', '../data/naive_approach.csv',
+             '../data/all-mobile-avg-reward.csv',
+             '../data/all-edge-avg-reward.csv', '../data/all-cloud-avg-reward.csv']
+    legends = ['DQN', 'Naive', 'Mobile', 'Edge', 'Cloud']
 
-x = []
-y = []
-for i, file in enumerate(files):
-    # draw_picture(file)
-    df = pd.read_csv(file)
-    x.append(df['Step'])
-    y1 = df['Value']
-    ysm = gaussian_filter1d(y1, sigma=1.3)
-    y.append(ysm)
-    # lr = re.search('lr-(.+?)-b', file)
-    # rm = re.search('rm-(.+?)k', file)
-    # lr = lr.group(1)
-    # rm = rm.group(1)
-    # legends.append(str(lr) + "/" + str(rm))
-    # # plt.legend("lr-" + str(m.group(1)))
-    # sns.lineplot(x,ysm)
+    x = []
+    y = []
+    for i, file in enumerate(files):
+        # draw_picture(file)
+        df = pd.read_csv(file)
+        x.append(df['Step'])
+        y1 = df['Value']
+        ysm = gaussian_filter1d(y1, sigma=1.3)
+        y.append(ysm)
+        # lr = re.search('lr-(.+?)-b', file)
+        # rm = re.search('rm-(.+?)k', file)
+        # lr = lr.group(1)
+        # rm = rm.group(1)
+        # legends.append(str(lr) + "/" + str(rm))
+        # # plt.legend("lr-" + str(m.group(1)))
+        # sns.lineplot(x,ysm)
 
-plt.plot(x[0], y[0], linestyle='-.', label='DQN')
-plt.plot(x[1], y[1], linestyle='-', label='Naive')
-plt.plot(x[2], y[2], linestyle='--', label='Mobile')
-plt.plot(x[3], y[3], linestyle='-', label='Edge')
-plt.plot(x[4], y[4], linestyle='-.', label='Cloud')
+    plt.plot(x[0], y[0], linestyle='-.', label='DQN')
+    plt.plot(x[1], y[1], linestyle='-', label='Naive')
+    plt.plot(x[2], y[2], linestyle='--', label='Mobile')
+    plt.plot(x[3], y[3], linestyle='-', label='Edge')
+    plt.plot(x[4], y[4], linestyle='-.', label='Cloud')
 
-plt.legend()
-plt.xlabel("Episodes")
-plt.ylabel("Value")
-plt.title("Average Reward")
-# plt.savefig("average-rewards-comparison.png")
-plt.show()
+    plt.legend()
+    plt.xlabel("Episodes")
+    plt.ylabel("Value")
+    plt.title("Average Reward")
+    # plt.savefig("average-rewards-comparison.png")
+    plt.show()
+
+
+def draw_losses():
+    sns.set_style("darkgrid")
+    fig = plt.figure()
+    # legends = []
+    # files = glob.glob("../data/reward-lr-0.001-*.csv")
+    files = ['../data/loss-lr-0.001-10k.csv', '../data/loss-lr-0.001-50k.csv', '../data/loss-lr-0.0001-10k.csv', '../data/loss-lr-0.00001-100k.csv']
+
+    x = []
+    y = []
+    for i, file in enumerate(files):
+        # draw_picture(file)
+        df = pd.read_csv(file)
+        x.append(df['Step'])
+        y1 = df['Value']
+        ysm = gaussian_filter1d(y1, sigma=1.3)
+        y.append(ysm)
+        # lr = re.search('lr-(.+?)-b', file)
+        # rm = re.search('rm-(.+?)k', file)
+        # lr = lr.group(1)
+        # rm = rm.group(1)
+        # legends.append(str(lr) + "/" + str(rm))
+        # # plt.legend("lr-" + str(m.group(1)))
+        # sns.lineplot(x,ysm)
+
+    plt.plot(x[0], y[0], linestyle='-.', label='0.001-10k')
+    plt.plot(x[1], y[1], linestyle='-', label='0.001-50k')
+    plt.plot(x[2], y[2], linestyle='--', label='0.0001-10k')
+    plt.plot(x[3], y[3], linestyle='-', label='0.00001-100')
+    # plt.plot(x[4], y[4], linestyle='-.', label='Cloud')
+
+    plt.legend()
+    plt.xlabel("Episodes")
+    plt.ylabel("Value")
+    plt.title("Loss Function")
+    # plt.savefig("average-rewards-comparison.png")
+    plt.show()
+
+
+
+
+def state_generation():
+    df = pd.read_csv('../data/state-trace.csv')
+    # df.to_csv('../data/states.csv', index=False)
+    print(df.drop_duplicates().shape)
+
+
+# draw_picture()
+# draw_comparisons()
+# state_generation()
+draw_losses()

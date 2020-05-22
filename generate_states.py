@@ -6,6 +6,9 @@ import random
 import numpy as np
 
 
+def read_state_from_file():
+    pass
+
 def cal_uplink_rate():
     # generate a uplink rate in 7-10 Mbps range
     rate = np.random.randint(7, 12)
@@ -42,6 +45,8 @@ def get_initial_state():
     return state
 
 
+def get_next_state():
+    pass
 #
 # def get_state_variables():
 #     uplink_rate = cal_uplink_rate()  # vary
