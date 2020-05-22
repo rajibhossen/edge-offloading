@@ -70,7 +70,8 @@ def draw_losses():
     fig = plt.figure()
     # legends = []
     # files = glob.glob("../data/reward-lr-0.001-*.csv")
-    files = ['../data/loss-lr-0.001-10k.csv', '../data/loss-lr-0.001-50k.csv', '../data/loss-lr-0.0001-10k.csv', '../data/loss-lr-0.00001-100k.csv']
+    files = ['../data/loss-lr-0.001-10k.csv', '../data/loss-lr-0.001-50k.csv', '../data/loss-lr-0.0001-10k.csv',
+             '../data/loss-lr-0.00001-100k.csv']
 
     x = []
     y = []
@@ -103,15 +104,19 @@ def draw_losses():
     plt.show()
 
 
-
-
 def state_generation():
-    df = pd.read_csv('../data/state-trace-0.01.csv')
+    df1 = pd.read_csv('../data/state-trace-0.001.csv')
+    df2 = pd.read_csv('../data/state-trace-0.01.csv')
+    df3 = df1.append(df2)
     # df.to_csv('../data/states.csv', index=False)
-    print(df.drop_duplicates().shape)
+    print(df1.drop_duplicates().shape)
+    print(df2.drop_duplicates().shape)
+    df3 = df3.drop_duplicates()
+    print(df3.shape)
+    df3.to_csv("../data/states.csv", header=False, index=False)
 
 
 # draw_picture()
 # draw_comparisons()
-# state_generation()
-draw_losses()
+state_generation()
+# draw_losses()

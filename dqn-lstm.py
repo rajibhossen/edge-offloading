@@ -43,7 +43,7 @@ EPISODES = 40000
 # Exploration settings
 epsilon = 1  # not a constant, going to be decayed
 EPSILON_DECAY = 0.99975
-MIN_EPSILON = 0.1
+MIN_EPSILON = 0.05
 
 #  Stats settings
 AGGREGATE_STATS_EVERY = 50  # episodes
@@ -141,7 +141,8 @@ class DQNLSTMAgent:
         model.add(Dense(500, activation='relu', input_shape=(1, 7)))
         # model.add(Dense(50, activation='relu'))
         # model.add(Dense(50, activation='relu'))
-        model.add(LSTM(50, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
+        # model.add(LSTM(50, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
+        model.add(LSTM(50, return_sequences=True))
         model.add(Dense(50, activation='relu'))
         model.add(Dense(self.n_actions, activation='linear'))  # linear or softmax
         # model = model(states)
