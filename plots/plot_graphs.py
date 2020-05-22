@@ -106,7 +106,7 @@ def draw_losses():
 
 
 def state_generation():
-    df = pd.read_csv('../data/state-trace.csv')
+    df = pd.read_csv('../data/state-trace-0.01.csv')
     # df.to_csv('../data/states.csv', index=False)
     print(df.drop_duplicates().shape)
 
