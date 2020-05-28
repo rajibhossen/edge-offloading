@@ -70,8 +70,7 @@ def draw_losses():
     fig = plt.figure()
     # legends = []
     # files = glob.glob("../data/reward-lr-0.001-*.csv")
-    files = ['../data/loss-lr-0.001-10k.csv', '../data/loss-lr-0.001-50k.csv', '../data/loss-lr-0.0001-10k.csv',
-             '../data/loss-lr-0.00001-100k.csv']
+    files = ['../data/loss-0.01.csv', '../data/loss-0.001.csv', '../data/loss-0.0001.csv']
 
     x = []
     y = []
@@ -90,33 +89,34 @@ def draw_losses():
         # # plt.legend("lr-" + str(m.group(1)))
         # sns.lineplot(x,ysm)
 
-    plt.plot(x[0], y[0], linestyle='-.', label='0.001-10k')
-    plt.plot(x[1], y[1], linestyle='-', label='0.001-50k')
-    plt.plot(x[2], y[2], linestyle='--', label='0.0001-10k')
-    plt.plot(x[3], y[3], linestyle='-', label='0.00001-100')
+    plt.plot(x[0], y[0], linestyle='-.', label='0.01')
+    plt.plot(x[1], y[1], linestyle='-', label='0.001')
+    plt.plot(x[2], y[2], linestyle='--', label='0.0001')
+    # plt.plot(x[3], y[3], linestyle='-', label='0.00001-100')
     # plt.plot(x[4], y[4], linestyle='-.', label='Cloud')
 
     plt.legend()
     plt.xlabel("Episodes")
     plt.ylabel("Value")
     plt.title("Loss Function")
-    # plt.savefig("average-rewards-comparison.png")
+    plt.savefig("loss-comparison.png")
     plt.show()
 
 
 def state_generation():
-    df1 = pd.read_csv('../data/state-trace-0.001.csv')
+    df1 = pd.read_csv('../data/state-trace.csv')
     df2 = pd.read_csv('../data/state-trace-0.01.csv')
-    df3 = df1.append(df2)
+    df3 = pd.read_csv('../data/state-trace-0.01-n.csv')
+    df4 = pd.read_csv('../data/state-trace-0.001.csv')
+    df5 = pd.read_csv('../data/state-trace-0.001-n.csv')
+    df6 = pd.concat([df1, df2, df3, df4, df5], sort=False)
     # df.to_csv('../data/states.csv', index=False)
-    print(df1.drop_duplicates().shape)
-    print(df2.drop_duplicates().shape)
-    df3 = df3.drop_duplicates()
-    print(df3.shape)
-    df3.to_csv("../data/states.csv", header=False, index=False)
+    df6 = df6.drop_duplicates()
+    print(df6.shape)
+    df6.to_csv("../data/states.csv", header=False, index=False)
 
 
 # draw_picture()
 # draw_comparisons()
-state_generation()
-# draw_losses()
+#state_generation()
+draw_losses()

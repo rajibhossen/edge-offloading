@@ -147,7 +147,7 @@ class DQNLSTMAgent:
         model.add(Dense(self.n_actions, activation='linear'))  # linear or softmax
         # model = model(states)
 
-        model.compile(loss="mean_squared_error", optimizer=Adam(lr=LEARNING_RATE), metrics=['accuracy'])
+        model.compile(loss="binary_crossentropy", optimizer=Adam(lr=LEARNING_RATE), metrics=['accuracy'])
         # print(model.summary())
         return model
 
@@ -248,7 +248,7 @@ stats = plotting.EpisodeStats(
 
 # step_actions = []
 # total_step = 1
-total_states = []
+# total_states = []
 for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
     # Update tensorboard step every episode
@@ -261,7 +261,7 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
     # Reset environment and get initial state
     current_state = env.reset()
     # print(current_state)
-    total_states.append(str(current_state))
+    # total_states.append(str(current_state))
 
     current_state = np.asarray(current_state)
 
@@ -283,8 +283,8 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
         new_state, reward, done = env.step(action)
 
-        if not done:
-            total_states.append(str(new_state))
+        # if not done:
+        #    total_states.append(str(new_state))
 
         new_state = np.asarray(new_state)
         new_state = normalize(new_state)
@@ -327,6 +327,6 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         epsilon = max(MIN_EPSILON, epsilon)
 
 # print(total_states)
-csv_writer(total_states)
+# csv_writer(total_states)
 
 plotting.plot_episode_stats(stats, filename="dqn-lstm-lr-0.001-b1024-rm-50k")
