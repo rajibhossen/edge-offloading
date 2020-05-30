@@ -35,7 +35,7 @@ UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
 MODEL_NAME = 'dqn-lstm'
 MIN_REWARD = -500  # For model save
 MEMORY_FRACTION = 0.20
-LEARNING_RATE = 0.00001
+LEARNING_RATE = 0.01
 
 # Environment settings
 EPISODES = 40000
