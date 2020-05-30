@@ -77,8 +77,10 @@ def draw_losses():
     for i, file in enumerate(files):
         # draw_picture(file)
         df = pd.read_csv(file)
-        x.append(df['Step'])
-        y1 = df['Value']
+        df1 = df[:625]
+        print(df1.shape)
+        x.append(df1['Step'])
+        y1 = df1['Value']
         ysm = gaussian_filter1d(y1, sigma=1.3)
         y.append(ysm)
         # lr = re.search('lr-(.+?)-b', file)
@@ -99,7 +101,7 @@ def draw_losses():
     plt.xlabel("Episodes")
     plt.ylabel("Value")
     plt.title("Loss Function")
-    plt.savefig("loss-comparison.png")
+    #plt.savefig("loss-comparison.png")
     plt.show()
 
 
