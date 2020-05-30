@@ -14,7 +14,7 @@ from keras.callbacks import TensorBoard
 from keras.layers import Dense, LSTM, Dropout
 from keras.models import Sequential
 from keras.models import load_model
-from keras.optimizers import Adam
+from keras.optimizers import Adam, SGD
 from keras.utils import normalize
 from tqdm import tqdm
 
@@ -35,7 +35,7 @@ UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
 MODEL_NAME = 'dqn-lstm'
 MIN_REWARD = -500  # For model save
 MEMORY_FRACTION = 0.20
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.00001
 
 # Environment settings
 EPISODES = 40000
@@ -147,7 +147,7 @@ class DQNLSTMAgent:
         model.add(Dense(self.n_actions, activation='linear'))  # linear or softmax
         # model = model(states)
 
-        model.compile(loss="binary_crossentropy", optimizer=Adam(lr=LEARNING_RATE), metrics=['accuracy'])
+        model.compile(loss="mean_squared_error", optimizer=SGD(lr=LEARNING_RATE), metrics=['accuracy'])
         # print(model.summary())
         return model
 
