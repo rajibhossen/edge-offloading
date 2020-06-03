@@ -70,14 +70,14 @@ def draw_losses():
     fig = plt.figure()
     # legends = []
     # files = glob.glob("../data/reward-lr-0.001-*.csv")
-    files = ['../data/loss-0.01.csv', '../data/loss-0.001.csv', '../data/loss-0.0001.csv']
+    files = [ '../data/loss-sgd-1e-4.csv','../data/loss-sgd-1e-5.csv']
 
     x = []
     y = []
     for i, file in enumerate(files):
         # draw_picture(file)
         df = pd.read_csv(file)
-        df1 = df[:625]
+        df1 = df[:1000]
         print(df1.shape)
         x.append(df1['Step'])
         y1 = df1['Value']
@@ -91,9 +91,9 @@ def draw_losses():
         # # plt.legend("lr-" + str(m.group(1)))
         # sns.lineplot(x,ysm)
 
-    plt.plot(x[0], y[0], linestyle='-.', label='0.01')
-    plt.plot(x[1], y[1], linestyle='-', label='0.001')
-    plt.plot(x[2], y[2], linestyle='--', label='0.0001')
+    plt.plot(x[0], y[0], linestyle='-.', label='1e-4')
+    plt.plot(x[1], y[1], linestyle='-', label='1e-5')
+    #plt.plot(x[2], y[2], linestyle='--', label='0.00001')
     # plt.plot(x[3], y[3], linestyle='-', label='0.00001-100')
     # plt.plot(x[4], y[4], linestyle='-.', label='Cloud')
 
@@ -101,7 +101,7 @@ def draw_losses():
     plt.xlabel("Episodes")
     plt.ylabel("Value")
     plt.title("Loss Function")
-    #plt.savefig("loss-comparison.png")
+    plt.savefig("loss-comparison.png")
     plt.show()
 
 
