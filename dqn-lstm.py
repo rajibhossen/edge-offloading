@@ -31,11 +31,11 @@ DISCOUNT = 0.90
 REPLAY_MEMORY_SIZE = 10000  # How many last steps to keep for model training
 MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
-UPDATE_TARGET_EVERY = 5  # Terminal states (end of episodes)
+UPDATE_TARGET_EVERY = 1  # Terminal states (end of episodes)
 MODEL_NAME = 'dqn-lstm'
 MIN_REWARD = -500  # For model save
 MEMORY_FRACTION = 0.20
-LEARNING_RATE = 0.000001
+LEARNING_RATE = 0.001
 
 # Environment settings
 EPISODES = 40000

@@ -70,7 +70,7 @@ def draw_losses():
     fig = plt.figure()
     # legends = []
     # files = glob.glob("../data/reward-lr-0.001-*.csv")
-    files = [ '../data/loss-sgd-1e-4.csv','../data/loss-sgd-1e-5.csv']
+    files = [ '../data/loss-rms-1e-3.csv','../data/loss-rms-1e-4.csv']#, '../data/loss-rms-1e-5.csv']
 
     x = []
     y = []
@@ -91,9 +91,9 @@ def draw_losses():
         # # plt.legend("lr-" + str(m.group(1)))
         # sns.lineplot(x,ysm)
 
-    plt.plot(x[0], y[0], linestyle='-.', label='1e-4')
-    plt.plot(x[1], y[1], linestyle='-', label='1e-5')
-    #plt.plot(x[2], y[2], linestyle='--', label='0.00001')
+    plt.plot(x[0], y[0], linestyle='-.', label='1e-3')
+    plt.plot(x[1], y[1], linestyle='-', label='1e-4')
+    #plt.plot(x[2], y[2], linestyle='--', label='1e-5')
     # plt.plot(x[3], y[3], linestyle='-', label='0.00001-100')
     # plt.plot(x[4], y[4], linestyle='-.', label='Cloud')
 
