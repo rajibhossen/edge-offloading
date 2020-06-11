@@ -19,13 +19,13 @@ class Edge:
         return tr_time
 
     def cal_transmit_energy(self, data):
-        # tr_energy = self.tr_power * self.cal_transmit_time(data) + self.tail_latency_energy * self.tail_duration
-        tr_energy = self.tr_power * self.cal_transmit_time(data)
+        tr_energy = self.tr_power * self.cal_transmit_time(data) + self.tail_latency_energy * self.tail_duration
+        # tr_energy = self.tr_power * self.cal_transmit_time(data)
         return tr_energy
 
     def cal_processing_time(self, cpu_cycle):
         proc_time = cpu_cycle / self.execution_cap
-        proc_time = proc_time  # in s
+        # proc_time = proc_time  # in s
         return proc_time
 
     def cal_price(self, proc_time):

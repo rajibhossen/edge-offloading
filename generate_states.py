@@ -62,9 +62,9 @@ def generate_state_trace():
     gen = energy_gen()
     final_i = 0
     for i in itertools.count():
-        data = random.randint(4096000, 16384000)
-        cpu_cycle = random.randint(1000000000, 5000000000)
-        delay = 2
+        data = random.randint(4096000, 16384000)  # 500KB - 2000 KB
+        cpu_cycle = random.randint(1000e6, 36000e6)  # 1000-36000 Mega Cycles
+        delay = 4  # 4s in each application
         uplink_rate = cal_uplink_rate()
         mobile_cap = get_mobile_availability()
         row = [data, cpu_cycle, delay, uplink_rate, mobile_cap, next(gen)]
@@ -72,10 +72,10 @@ def generate_state_trace():
             continue
         else:
             states.append(row)
-        if len(states) >= 100000:
+        if len(states) >= 150000:
             break
         final_i = i
-
+    print(final_i)
     with open('data/state_trace.csv', 'a+') as file:
         writer = csv.writer(file)
         for num, item in enumerate(states):
@@ -111,6 +111,7 @@ def read_state_from_file():
 
 
 if __name__ == '__main__':
-    result = read_state_from_file()
-    for i in range(10):
-        print(next(result))
+    # result = read_state_from_file()
+    # for i in range(10):
+    #     print(next(result))
+    generate_state_trace()
