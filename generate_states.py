@@ -1,13 +1,11 @@
+import csv
 import itertools
 
 from task import get_random_task
 from system_parameters import parameter
 import random
 import numpy as np
-
-
-def read_state_from_file():
-    pass
+import itertools
 
 
 def cal_uplink_rate():
@@ -48,11 +46,71 @@ def get_initial_state():
 
 def get_next_state():
     pass
-#
-# def get_state_variables():
-#     uplink_rate = cal_uplink_rate()  # vary
-#     mobile_cap = get_mobile_availability()  # vary based on load
-#     server_cap = get_server_availability()  # vary based on load
-#     energy = 342  # vary based on load
-#     state = [create_task(), uplink_rate, mobile_cap, server_cap, energy]
-#     return state
+
+
+def energy_gen():
+    energy = 100
+    while True:
+        yield energy
+        energy -= 10
+        if energy < 10:
+            energy = 100
+
+
+def generate_state_trace():
+    states = []
+    gen = energy_gen()
+    final_i = 0
+    for i in itertools.count():
+        data = random.randint(4096000, 16384000)
+        cpu_cycle = random.randint(1000000000, 5000000000)
+        delay = 2
+        uplink_rate = cal_uplink_rate()
+        mobile_cap = get_mobile_availability()
+        row = [data, cpu_cycle, delay, uplink_rate, mobile_cap, next(gen)]
+        if row in states:
+            continue
+        else:
+            states.append(row)
+        if len(states) >= 100000:
+            break
+        final_i = i
+
+    with open('data/state_trace.csv', 'a+') as file:
+        writer = csv.writer(file)
+        for num, item in enumerate(states):
+            item.insert(0, num + 1)
+            writer.writerow(item)
+
+
+def edge_generator():
+    file = 'data/edge_trace.csv'
+    for row in open(file):
+        yield row
+
+
+def state_generator():
+    file = 'data/state_trace.csv'
+    for row in open(file):
+        yield row
+
+
+def read_state_from_file():
+    state_gen = state_generator()
+    edge_gen = edge_generator()
+    while True:
+        state = next(state_gen)
+        edge_trace = next(edge_gen)
+        state = state.split(',')
+        edge_trace = edge_trace.split(',')
+        state = [float(item) for item in state]
+        edge_trace = [float(item) for item in edge_trace]
+        state.append(edge_trace[1])
+        final_state = [state[1], state[2], state[3], state[4], state[5], state[7], state[6]]
+        yield final_state
+
+
+if __name__ == '__main__':
+    result = read_state_from_file()
+    for i in range(10):
+        print(next(result))

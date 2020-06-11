@@ -3,17 +3,15 @@ import csv
 from math import ceil
 
 import gym
-
+import numpy as np
 from cloud import Cloud
 from edge import Edge
-from generate_states import *
+from generate_states import read_state_from_file
 from mobile import Mobile
+from system_parameters import parameter
 
 
 class Environment(gym.Env):
-
-    def render(self, mode='human'):
-        pass
 
     def __init__(self):
         super(Environment, self).__init__()
@@ -23,9 +21,14 @@ class Environment(gym.Env):
         self.weight = 0.5
         self.total_energy = parameter["total_energy"]
         self.threshold_energy = 10
+        self.get_state = read_state_from_file()
+
+    def render(self, mode='human'):
+        pass
 
     def reset(self):
-        self.state = get_initial_state()
+        self.state = next(self.get_state)
+        # self.state = get_initial_state()
         return copy.copy(self.state)
 
     def step(self, action):
@@ -54,7 +57,7 @@ class Environment(gym.Env):
             computing_cost, execution_delay, energy_used = cloud.cal_total_cost(data, cpu_cycle, self.weight,
                                                                                 energy_factor)
 
-        energy_used = ceil(energy_used)
+        # energy_used = ceil(energy_used)
         energy_left = energy_left - energy_used
 
         # scaled_reward = ((m_total - computing_cost) / m_total) * 100.0
@@ -77,34 +80,37 @@ class Environment(gym.Env):
                 reward = parameter['max_penalty']
                 # done = False
                 # begin old state assignment
-                task = get_random_task()
-                self.state[0] = task['data']
-                self.state[1] = task['cpu_cycle']
-                self.state[2] = task['dt']
-                self.state[3] = cal_uplink_rate()
-                self.state[4] = get_mobile_availability()
-                self.state[5] = get_server_availability()
-                self.state[6] = energy_left
+                # task = next(self.get_state)
+                # self.state[0] = task['data']
+                # self.state[1] = task['cpu_cycle']
+                # self.state[2] = task['dt']
+                # self.state[3] = cal_uplink_rate()
+                # self.state[4] = get_mobile_availability()
+                # self.state[5] = get_server_availability()
+                # self.state[6] = energy_left # previously get_energy_availability
                 # end old state assignment
-                # self.state[6] = get_energy_availability()
+                self.state = next(self.get_state)
             else:
                 # compare with mobile computation and
                 # positive or negative based on local computing
                 reward = -computing_cost
                 # done = False
-                task = get_random_task()
-                self.state[0] = task['data']
-                self.state[1] = task['cpu_cycle']
-                self.state[2] = task['dt']
-                self.state[3] = cal_uplink_rate()
-                self.state[4] = get_mobile_availability()
-                self.state[5] = get_server_availability()
-                self.state[6] = energy_left
-                # self.state[6] = get_energy_availability()
+                # task = get_random_task()
+                # self.state[0] = task['data']
+                # self.state[1] = task['cpu_cycle']
+                # self.state[2] = task['dt']
+                # self.state[3] = cal_uplink_rate()
+                # self.state[4] = get_mobile_availability()
+                # self.state[5] = get_server_availability()
+                # self.state[6] = energy_left
+                self.state = next(self.get_state)
 
         return self.state, reward, done
 
 
-# if __name__ == '__main__':
-#     env = Environment()
-#     # print(env.read_states())
+if __name__ == '__main__':
+    env = Environment()
+    ini = env.reset()
+    print(ini)
+    print(env.step(0))
+    # print(env.read_states())

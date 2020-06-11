@@ -31,14 +31,14 @@ DISCOUNT = 0.90
 REPLAY_MEMORY_SIZE = 10000  # How many last steps to keep for model training
 MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
-UPDATE_TARGET_EVERY = 1  # Terminal states (end of episodes)
+UPDATE_TARGET_EVERY = 50  # Terminal states (end of episodes)
 MODEL_NAME = 'dqn-lstm'
 MIN_REWARD = -500  # For model save
 MEMORY_FRACTION = 0.20
 LEARNING_RATE = 0.001
 
 # Environment settings
-EPISODES = 40000
+EPISODES = 20000
 
 # Exploration settings
 epsilon = 1  # not a constant, going to be decayed
@@ -247,7 +247,7 @@ stats = plotting.EpisodeStats(
     episode_rewards=np.zeros(EPISODES + 1))
 
 # step_actions = []
-# total_step = 1
+total_step = 1
 # total_states = []
 for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
@@ -282,9 +282,10 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
             action = np.random.randint(0, env.n_actions)
 
         new_state, reward, done = env.step(action)
-
         # if not done:
         #    total_states.append(str(new_state))
+
+        print(current_state, action, reward)
 
         new_state = np.asarray(new_state)
         new_state = normalize(new_state)
@@ -304,7 +305,7 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
         current_state = new_state
         step += 1
-
+        total_step += 1
         if done:
             break
 
@@ -317,16 +318,18 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward,
                                        epsilon=epsilon)
 
-        # Save model, but only when min reward is greater or equal a set value
-        if min_reward >= MIN_REWARD:
-            agent.model.save(f'models/{MODEL_NAME}.model')
+        # # Save model, but only when min reward is greater or equal a set value
+        # if min_reward >= MIN_REWARD:
+        #     agent.model.save(f'models/{MODEL_NAME}.model')
 
     # Decay epsilon
     if epsilon > MIN_EPSILON:
         epsilon *= EPSILON_DECAY
         epsilon = max(MIN_EPSILON, epsilon)
 
+agent.model.save(f'models/{MODEL_NAME}.model')
+print("Total Steps: ", total_step)
 # print(total_states)
 # csv_writer(total_states)
 
-plotting.plot_episode_stats(stats, filename="dqn-lstm-lr-0.001-b1024-rm-50k")
+plotting.plot_episode_stats(stats, filename="dqn-lstm")
