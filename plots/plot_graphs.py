@@ -29,10 +29,10 @@ def draw_comparisons():
     fig = plt.figure()
     # legends = []
     # files = glob.glob("../data/reward-lr-0.001-*.csv")
-    files = ['../data/reward_avg-dqn-tf.csv', '../data/naive_approach.csv',
+    files = ['../data/reward-rms-1e-3.csv', '../data/naive_approach.csv',
              '../data/all-mobile-avg-reward.csv',
              '../data/all-edge-avg-reward.csv', '../data/all-cloud-avg-reward.csv']
-    legends = ['DQN', 'Naive', 'Mobile', 'Edge', 'Cloud']
+    legends = ['LSTM', 'Naive', 'Mobile', 'Edge', 'Cloud']
 
     x = []
     y = []
@@ -119,6 +119,6 @@ def state_generation():
 
 
 # draw_picture()
-# draw_comparisons()
+draw_comparisons()
 #state_generation()
-draw_losses()
+#draw_losses()

@@ -78,12 +78,14 @@ def get_action(state):
     server_cap = state[5]
     energy_left = state[6]
 
+
+    energy_factor = energy_left / 100.0
+    energy_factor = 1 - energy_factor
+
     device = Mobile(mobile_cap)
-    # energy_factor = energy_left / 100.0
-    # energy_factor = 1 - energy_factor
     m_total, m_time, m_energy = device.calculate_cost_naive(cpu_cycle, 0.5)
     edge = Edge(uplink_rate, server_cap)
-    e_total, e_time, e_energy = edge.cal_total_cost_naive(data, cpu_cycle, 0.5)
+    e_total, e_time, e_energy = edge.cal_total_cost(data, cpu_cycle, 0.5, energy_factor)
     cloud = Cloud(uplink_rate)
     c_total, c_time, c_energy = cloud.cal_total_cost_naive(data, cpu_cycle, 0.5)
 
@@ -139,7 +141,7 @@ def update(env, episodes=4):
 
 
 if __name__ == '__main__':
-    num_of_episodes = 40000
+    num_of_episodes = 12000
 
     env = Environment()
 

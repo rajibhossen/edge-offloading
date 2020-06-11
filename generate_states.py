@@ -106,7 +106,7 @@ def read_state_from_file():
         state = [float(item) for item in state]
         edge_trace = [float(item) for item in edge_trace]
         state.append(edge_trace[1])
-        final_state = [state[1], state[2], state[3], state[4], state[5], state[7], state[6]]
+        final_state = [state[1], state[2], state[3] + 4.0, state[4], state[5], state[7], state[6]]
         yield final_state
 
 

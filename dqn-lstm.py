@@ -38,7 +38,7 @@ MEMORY_FRACTION = 0.20
 LEARNING_RATE = 0.001
 
 # Environment settings
-EPISODES = 20000
+EPISODES = 12000
 
 # Exploration settings
 epsilon = 1  # not a constant, going to be decayed
@@ -214,7 +214,7 @@ class DQNLSTMAgent:
         # print("Training y: ", y.shape)
         # X = np.array(X).reshape(64, 7)
         # Fit on all samples as one batch, log only on terminal state
-        self.model.fit(X, y, batch_size=MINIBATCH_SIZE, verbose=0, shuffle=False,
+        self.model.fit(X, y, batch_size=MINIBATCH_SIZE, epochs=10, verbose=0, shuffle=False,
                        callbacks=[self.tensorboard] if terminal_state else None)
 
         # Update target network counter every episode
@@ -285,7 +285,7 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         # if not done:
         #    total_states.append(str(new_state))
 
-        print(current_state, action, reward)
+        # print(current_state, action, reward)
 
         new_state = np.asarray(new_state)
         new_state = normalize(new_state)
@@ -329,6 +329,7 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
 agent.model.save(f'models/{MODEL_NAME}.model')
 print("Total Steps: ", total_step)
+print("Missed deadline: ", env.missed_deadline)
 # print(total_states)
 # csv_writer(total_states)
 

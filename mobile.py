@@ -30,7 +30,6 @@ class Mobile:
     def calculate_cost_naive(self, cpu_cycle, weight):
         time = self.calculate_time(cpu_cycle)
         energy = self.calculate_energy(cpu_cycle)
-        #energy = self.cal_energy_by_data(data)
         total = (1 - weight) * time + weight * energy
         return total, time, energy
 

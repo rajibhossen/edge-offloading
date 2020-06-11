@@ -22,6 +22,7 @@ class Environment(gym.Env):
         self.total_energy = parameter["total_energy"]
         self.threshold_energy = 10
         self.get_state = read_state_from_file()
+        self.missed_deadline = 0
 
     def render(self, mode='human'):
         pass
@@ -77,6 +78,8 @@ class Environment(gym.Env):
             done = False
             # print(execution_delay, dt)
             if execution_delay > dt:
+                self.missed_deadline += 1
+
                 reward = parameter['max_penalty']
                 # done = False
                 # begin old state assignment
