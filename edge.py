@@ -47,7 +47,7 @@ class Edge:
 
         process_here = self.server_utilization - 0.5
 
-        if random.uniform(0, 1) < (2 * process_here):
+        if random.uniform(0, 1) > (2 * process_here):
             proc_time = self.cal_processing_time(cpu_cycle)
             money = self.cal_price(proc_time)
             time = edge_tr_time + proc_time

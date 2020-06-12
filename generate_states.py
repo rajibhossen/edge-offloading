@@ -63,7 +63,7 @@ def generate_state_trace():
     final_i = 0
     for i in itertools.count():
         data = random.randint(4096000, 16384000)  # 500KB - 2000 KB
-        cpu_cycle = random.randint(1000e6, 36000e6)  # 1000-36000 Mega Cycles
+        cpu_cycle = random.randint(1000e6, 10000e6)  # 1000-10000 Mega Cycles
         delay = 4  # 4s in each application
         uplink_rate = cal_uplink_rate()
         mobile_cap = get_mobile_availability()
@@ -106,7 +106,7 @@ def read_state_from_file():
         state = [float(item) for item in state]
         edge_trace = [float(item) for item in edge_trace]
         state.append(edge_trace[1])
-        final_state = [state[1], state[2], state[3] + 4.0, state[4], state[5], state[7], state[6]]
+        final_state = [state[1], state[2], state[3] + 6.0, state[4], state[5], state[7], state[6]]
         yield final_state
 
 

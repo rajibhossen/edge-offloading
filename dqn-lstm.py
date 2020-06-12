@@ -214,7 +214,7 @@ class DQNLSTMAgent:
         # print("Training y: ", y.shape)
         # X = np.array(X).reshape(64, 7)
         # Fit on all samples as one batch, log only on terminal state
-        self.model.fit(X, y, batch_size=MINIBATCH_SIZE, verbose=0, shuffle=False,
+        self.model.fit(X, y, batch_size=MINIBATCH_SIZE, epochs=5, verbose=0, shuffle=False,
                        callbacks=[self.tensorboard] if terminal_state else None)
 
         # Update target network counter every episode

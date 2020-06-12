@@ -67,9 +67,9 @@ def make_task_from_applications(application):
 def get_fixed_task():
     size = 300000
     task = {
-        "data": 2000*1024*8,
-        "cpu_cycle": 3000*1e6,
-        "dt": 100
+        "data": 6045514,
+        "cpu_cycle": 19692793685,
+        "dt": 8
     }
     return task
 
