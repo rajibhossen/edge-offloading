@@ -63,7 +63,7 @@ def generate_state_trace():
     final_i = 0
     for i in itertools.count():
         data = random.randint(4096000, 16384000)  # 500KB - 2000 KB
-        cpu_cycle = random.randint(1000e6, 10000e6)  # 1000-10000 Mega Cycles
+        cpu_cycle = random.randint(1000e6, 15000e6)  # 1000-10000 Mega Cycles
         delay = 4  # 4s in each application
         uplink_rate = cal_uplink_rate()
         mobile_cap = get_mobile_availability()
