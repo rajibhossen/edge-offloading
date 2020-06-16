@@ -48,12 +48,12 @@ class Environment(gym.Env):
         energy_factor = 1 - energy_factor
 
         device = Mobile(mobile_cap)
-        m_total, m_time, m_energy, m_price = device.calculate_total_cost(cpu_cycle, self.weight, energy_factor)
+        m_total, m_time, m_energy = device.calculate_total_cost(cpu_cycle, self.weight, energy_factor)
         if action == 0:  # local computing
             device = Mobile(mobile_cap)
             # computing_cost, execution_delay, energy_used = device.calculate_total_cost(task, self.weight,
             # energy_factor)
-            computing_cost, execution_delay, energy_used, off_price = m_total, m_time, m_energy, m_price
+            computing_cost, execution_delay, energy_used, off_price = m_total, m_time, m_energy, 0
         elif action == 1:  # offload to edge
             edge = Edge(uplink_rate, server_cap)
             computing_cost, execution_delay, energy_used, off_price = edge.cal_total_cost(data, cpu_cycle, self.weight,

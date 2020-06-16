@@ -41,7 +41,7 @@ LEARNING_RATE = 0.001
 EPISODES = 50000
 
 # Exploration settings
-epsilon = 1  # not a constant, going to be decayed
+epsilon = 0.05  # not a constant, going to be decayed
 EPSILON_DECAY = 0.99975
 MIN_EPSILON = 0.05
 
@@ -322,9 +322,9 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         #     agent.model.save(f'models/{MODEL_NAME}.model')
 
     # Decay epsilon
-    if epsilon > MIN_EPSILON:
-        epsilon *= EPSILON_DECAY
-        epsilon = max(MIN_EPSILON, epsilon)
+    # if epsilon > MIN_EPSILON:
+    #     epsilon *= EPSILON_DECAY
+    #     epsilon = max(MIN_EPSILON, epsilon)
     print(f"Step {total_step}/100000\n")
     # iterate for 100k data, not just episode
     if total_step >= 100000:
