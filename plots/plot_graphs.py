@@ -27,15 +27,18 @@ def plot_bars():
     # ax = fig.add_axes([0, 0, 1, 1])
     algo = ['DQN', 'All Mobile', 'All Edge', 'All Cloud', 'Naive']
     # total execution data
-    execution_delay = [2533707.903024052, 13518874.000179151, 3142864.171568715, 2424207.0244918857, 1862416.8062593315]
+    execution_delay = [1533707.903024052, 13518874.000179151, 3142864.171568715, 2424207.0244918857, 1862416.8062593315]
     total_energies = [634557.0049511091, 1749465.1073236275, 344369.881719523, 456869.8817195224, 384392.8817195243]
-    money = [330061.19886334456, 0, 543018.6633310195, 191984.009469998, 224254.14633212643]
+    money = [309192.8942792864, 0, 543018.6633310195, 191984.009469998, 224254.14633212643]
     missed_deadlines = [9751, 20837, 29641, 14280, 5895]
     plt.bar(algo, execution_delay)
     plt.xlabel("Algorithms")
-    plt.ylabel("Total Execution delay (sec)")
-    plt.title("Total Execution Time Comparison of Algorithms")
+    plt.ylabel("Total Execution Delay (Sec)")
+    plt.title("Total Execution Delay Comparison of Algorithms")
     plt.savefig("execution-time-comparison.png")
+    # plt.ylabel("Total Offloading Cost (USD)")
+    # plt.title("Total Offloading Cost Comparison of Algorithms")
+    # plt.savefig("off-price-comparison.png")
     plt.show()
 
 

@@ -55,9 +55,9 @@ env = Environment()
 ep_rewards = [-1000]
 
 # For more repetitive results
-# random.seed(1)
-# np.random.seed(1)
-# tf.set_random_seed(1)
+random.seed(1)
+np.random.seed(1)
+tf.set_random_seed(1)
 
 # Memory fraction, used mostly when trai8ning multiple agents
 # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=MEMORY_FRACTION)
