@@ -16,10 +16,6 @@ class Mobile:
         energy = self.esc * (self.computing_capability ** 2) * cpu_cycle
         return energy
 
-    def cal_energy_by_data(self, data):
-        energy = 3.25e-6 * data
-        return energy
-
     def calculate_total_cost(self, cpu_cycle, weight, energy_factor):
         time = self.calculate_time(cpu_cycle)
         energy = self.calculate_energy(cpu_cycle)

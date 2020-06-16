@@ -49,26 +49,27 @@ def get_next_state():
 
 
 def energy_gen():
-    energy = 100
+    energy = 340
     while True:
         yield energy
-        energy -= 10
-        if energy < 10:
-            energy = 100
+        energy -= 30
+        if energy < 70:
+            energy = 340
 
 
 def generate_state_trace():
     states = []
     gen = energy_gen()
-    final_i = 0
+    final_i = 1
     for i in itertools.count():
-        data = random.randint(4096000, 16384000)  # 500KB - 2000 KB
-        cpu_cycle = random.randint(1000e6, 10000e6)  # 1000-10000 Mega Cycles
-        delay = 4  # 4s in each application
+        data = random.randint(8388608, 33554432)  # 1MB  - 4MB
+        cpu_cycle = random.randint(10000e6, 30000e6)  # 10k-30k Mega Cycles
+        delay = 30  # 10s in each application
         uplink_rate = cal_uplink_rate()
         mobile_cap = get_mobile_availability()
         row = [data, cpu_cycle, delay, uplink_rate, mobile_cap, next(gen)]
         if row in states:
+            print("skipping duplicates")
             continue
         else:
             states.append(row)
@@ -76,7 +77,7 @@ def generate_state_trace():
             break
         final_i = i
     print(final_i)
-    with open('data/state_trace.csv', 'w+') as file:
+    with open('data/state_trace.csv', 'w+', newline='') as file:
         writer = csv.writer(file)
         for num, item in enumerate(states):
             item.insert(0, num + 1)
@@ -106,7 +107,7 @@ def read_state_from_file():
         state = [float(item) for item in state]
         edge_trace = [float(item) for item in edge_trace]
         state.append(edge_trace[1])
-        final_state = [state[1], state[2], state[3] + 6.0, state[4], state[5], state[7], state[6]]
+        final_state = [state[1], state[2], state[3]-5, state[4], state[5], state[7], state[6]]
         yield final_state
 
 

@@ -17,7 +17,7 @@ matplotlib.style.use('ggplot')
 ep_rewards = []
 AGGREGATE_STATS_EVERY = 50  # episodes
 
-filename = "data/all-cloud-avg-reward.csv"
+filename = "data/all-mobile-avg-reward.csv"
 with open(filename, "a+") as avg_reward:
     csv_writer = csv.writer(avg_reward, delimiter=",")
     csv_writer.writerow(['Step', 'Value'])
@@ -29,7 +29,7 @@ def save_avg_reward(data):
         csv_writer.writerow(data)
 
 
-def update(env, episodes=40000):
+def update(env, episodes=12000):
     # state = env.reset()
     for episode in range(1, episodes + 1):
         total_reward = 0
@@ -48,8 +48,11 @@ def update(env, episodes=40000):
         ep_rewards.append(total_reward)
         if not episode % AGGREGATE_STATS_EVERY or episode == 1:
             average_reward = sum(ep_rewards[-AGGREGATE_STATS_EVERY:]) / len(ep_rewards[-AGGREGATE_STATS_EVERY:])
-            save_avg_reward([episode, average_reward])
+            # save_avg_reward([episode, average_reward])
     # save_to_file(RL.q_table)
+    print("Missed deadline: ", env.missed_deadline)
+    print("Total Execution Time: ", env.exe_delay)
+    print("Total Energy cost: ", env.tot_energy_cost)
     print("complete")
     # print(stats)
 
@@ -62,10 +65,10 @@ def update(env, episodes=40000):
 
 
 if __name__ == '__main__':
-    num_of_episodes = 40000
+    num_of_episodes = 12000
 
-    env = NaiveEnvironment()
-
+    # env = NaiveEnvironment()
+    env = Environment()
     stats = plotting.EpisodeStats(
         episode_lengths=np.zeros(num_of_episodes + 1),
         episode_rewards=np.zeros(num_of_episodes + 1))

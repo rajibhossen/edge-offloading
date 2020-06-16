@@ -22,17 +22,33 @@ def draw_picture(filename):
     plt.show()
 
 
-# draw_picture("../data/dqn-episode-actions.csv")
+def plot_bars():
+    fig = plt.figure()
+    # ax = fig.add_axes([0, 0, 1, 1])
+    algo = ['DQN', 'All Mobile', 'All Edge', 'All Cloud', 'Naive']
+    # total execution data
+    execution_delay = [2628303.5473039835, 13518874.000179151, 3142864.171568715, 2323662.949356631, 1830121.6529592853]
+    total_energies = [621120.9701678093, 1749465.1073236275, 344369.881719523, 456869.8817195224, 384392.8817195243]
+    money = [200000, 0, 540183.1558762271, 191984.009469998, 224254.14633212643]
+    missed_deadlines = [9751, 19221, 29641, 14280, 5895]
+    plt.bar(algo, money)
+    plt.xlabel("Algorithms")
+    plt.ylabel("Total Delays")
+    plt.title("Execution Time Comparison of Algorithms")
+    plt.show()
+
+
+plot_bars()
+
 
 def draw_comparisons():
     sns.set_style("darkgrid")
     fig = plt.figure()
     # legends = []
     # files = glob.glob("../data/reward-lr-0.001-*.csv")
-    files = ['../data/reward-rms-1e-3.csv', '../data/naive_approach.csv',
-             '../data/all-mobile-avg-reward.csv',
-             '../data/all-edge-avg-reward.csv', '../data/all-cloud-avg-reward.csv']
-    legends = ['LSTM', 'Naive', 'Mobile', 'Edge', 'Cloud']
+    files = ['../data/reward-rms-1e-3.csv', '../data/all-mobile-avg-reward.csv', '../data/all-edge-avg-reward.csv',
+             '../data/all-cloud-avg-reward.csv']  # , '../data/naive_approach.csv']
+    legends = ['LSTM', 'Mobile', 'Edge', 'Cloud']
 
     x = []
     y = []
@@ -52,10 +68,10 @@ def draw_comparisons():
         # sns.lineplot(x,ysm)
 
     plt.plot(x[0], y[0], linestyle='-.', label='DQN')
-    plt.plot(x[1], y[1], linestyle='-', label='Naive')
-    plt.plot(x[2], y[2], linestyle='--', label='Mobile')
-    plt.plot(x[3], y[3], linestyle='-', label='Edge')
-    plt.plot(x[4], y[4], linestyle='-.', label='Cloud')
+    plt.plot(x[1], y[1], linestyle='-', label='Mobile')
+    plt.plot(x[2], y[2], linestyle='--', label='Edge')
+    plt.plot(x[3], y[3], linestyle='-', label='Cloud')
+    # plt.plot(x[4], y[4], linestyle='-.', label='Naive')
 
     plt.legend()
     plt.xlabel("Episodes")
@@ -70,7 +86,7 @@ def draw_losses():
     fig = plt.figure()
     # legends = []
     # files = glob.glob("../data/reward-lr-0.001-*.csv")
-    files = [ '../data/loss-rms-1e-3.csv','../data/loss-rms-1e-4.csv']#, '../data/loss-rms-1e-5.csv']
+    files = ['../data/reward.csv', '../data/reward-r.csv']
 
     x = []
     y = []
@@ -91,9 +107,9 @@ def draw_losses():
         # # plt.legend("lr-" + str(m.group(1)))
         # sns.lineplot(x,ysm)
 
-    plt.plot(x[0], y[0], linestyle='-.', label='1e-3')
-    plt.plot(x[1], y[1], linestyle='-', label='1e-4')
-    #plt.plot(x[2], y[2], linestyle='--', label='1e-5')
+    plt.plot(x[0], y[0], linestyle='-.', label='1e-4')
+    plt.plot(x[1], y[1], linestyle='-', label='1e-4 v2')
+    # plt.plot(x[2], y[2], linestyle='--', label='1e-5')
     # plt.plot(x[3], y[3], linestyle='-', label='0.00001-100')
     # plt.plot(x[4], y[4], linestyle='-.', label='Cloud')
 
@@ -101,7 +117,7 @@ def draw_losses():
     plt.xlabel("Episodes")
     plt.ylabel("Value")
     plt.title("Loss Function")
-    plt.savefig("loss-comparison.png")
+    # plt.savefig("loss-comparison.png")
     plt.show()
 
 
@@ -117,8 +133,7 @@ def state_generation():
     print(df6.shape)
     df6.to_csv("../data/states.csv", header=False, index=False)
 
-
 # draw_picture()
-draw_comparisons()
-#state_generation()
+# draw_comparisons()
+# state_generation()
 #draw_losses()

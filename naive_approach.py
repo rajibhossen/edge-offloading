@@ -1,148 +1,139 @@
-import csv
-import os
-import shutil
 import itertools
+
 import matplotlib.style
-import numpy as np
 
 from cloud import Cloud
 from edge import Edge
-from lib import plotting
-
 from environment import Environment
+from generate_states import read_state_from_file
 from mobile import Mobile
-from naive_env import NaiveEnvironment
-from qlearning import QLearningTable
-from pandas import DataFrame
 
 matplotlib.style.use('ggplot')
 
+
 # For stats
-mobile_costs = []
-edge_costs = []
-cloud_costs = []
-naive_costs = []
-
-AGGREGATE_STATS_EVERY = 50  # episodes
-
-m_file = "data/all-mobile-avg-reward.csv"
-with open(m_file, "a+") as avg_reward:
-    csv_writer = csv.writer(avg_reward, delimiter=",")
-    csv_writer.writerow(['Step', 'Value'])
-
-e_file = "data/all-edge-avg-reward.csv"
-with open(e_file, "a+") as avg_reward:
-    csv_writer = csv.writer(avg_reward, delimiter=",")
-    csv_writer.writerow(['Step', 'Value'])
-
-c_file = "data/all-cloud-avg-reward.csv"
-with open(c_file, "a+") as avg_reward:
-    csv_writer = csv.writer(avg_reward, delimiter=",")
-    csv_writer.writerow(['Step', 'Value'])
-
-n_file = "data/naive_approach.csv"
-with open(n_file, "a+") as avg_reward:
-    csv_writer = csv.writer(avg_reward, delimiter=",")
-    csv_writer.writerow(['Step', 'Value'])
 
 
-def m_save(data):
-    with open(m_file, "a+") as mr:
-        csv_writer = csv.writer(mr, delimiter=",")
-        csv_writer.writerow(data)
-
-
-def e_save(data):
-    with open(e_file, "a+") as er:
-        csv_writer = csv.writer(er, delimiter=",")
-        csv_writer.writerow(data)
-
-
-def c_save(data):
-    with open(c_file, "a+") as cr:
-        csv_writer = csv.writer(cr, delimiter=",")
-        csv_writer.writerow(data)
-
-
-def n_save(data):
-    with open(n_file, "a+") as nr:
-        csv_writer = csv.writer(nr, delimiter=",")
-        csv_writer.writerow(data)
-
-
-def get_action(state):
+def calculate_costs(state):
     data = state[0]
     cpu_cycle = state[1]
+    dt = state[2]
     uplink_rate = state[3]
     mobile_cap = state[4]
     server_cap = state[5]
     energy_left = state[6]
-
-
-    energy_factor = energy_left / 100.0
+    global mobile_energy, mobile_exec, edge_energy, edge_exec, cloud_energy, \
+        cloud_exec, naive_energy, naive_exec, mobile_miss_dt, edge_miss_dt, \
+        cloud_miss_dt, naive_miss_dt, edge_prices, cloud_prices, naive_prices
+    energy_factor = energy_left / 340
     energy_factor = 1 - energy_factor
 
     device = Mobile(mobile_cap)
-    m_total, m_time, m_energy = device.calculate_cost_naive(cpu_cycle, 0.5)
+    m_total, m_time, m_energy = device.calculate_total_cost(cpu_cycle, 0.7, energy_factor)
+    # print(m_energy)
     edge = Edge(uplink_rate, server_cap)
-    e_total, e_time, e_energy = edge.cal_total_cost(data, cpu_cycle, 0.5, energy_factor)
+    e_total, e_time, e_energy, e_price = edge.cal_total_cost(data, cpu_cycle, 0.7, energy_factor)
     cloud = Cloud(uplink_rate)
-    c_total, c_time, c_energy = cloud.cal_total_cost_naive(data, cpu_cycle, 0.5)
+    c_total, c_time, c_energy, c_price = cloud.cal_total_cost(data, cpu_cycle, 0.7, energy_factor)
 
     costs = [m_total, e_total, c_total]
     # get minimum cost action
     action = costs.index(min(costs))
+
+    mobile_exec += m_time
+    mobile_energy += m_energy
+    if m_time > dt:
+        mobile_miss_dt += 1
+
+    edge_exec += e_time
+    edge_energy += e_energy
+    edge_prices += e_price
+    if e_time > dt:
+        #print(e_time)
+        edge_miss_dt += 1
+
+    cloud_exec += c_time
+    cloud_energy += c_energy
+    cloud_prices += c_price
+    if c_time > dt:
+        #print(c_time)
+        cloud_miss_dt += 1
+
+    if action == 0:
+        naive_exec += m_time
+        naive_energy += m_energy
+        if m_time > dt:
+            naive_miss_dt += 1
+    elif action == 1:
+        naive_exec += e_time
+        naive_energy += e_energy
+        naive_prices += e_price
+        if e_time > dt:
+            naive_miss_dt += 1
+    else:
+        naive_exec += c_time
+        naive_energy += c_energy
+        naive_prices += c_price
+        if c_time > dt:
+            naive_miss_dt += 1
     # print(costs)
-    return -m_total, -e_total, -c_total, -min(costs), action
+    return
 
 
-def update(env, episodes=4):
+def update(state_gen):
     # state = env.reset()
-    for episode in range(1, episodes + 1):
-        m_cost, e_cost, c_cost, n_cost = 0, 0, 0, 0
-        state = env.reset()
-        for t in itertools.count():
-            print("Episode [%d] Iteration: %d" % (episode, t))
+    total_step = 1
+    for t in itertools.count():
+        state = next(state_gen)
+        calculate_costs(state)
+        total_step += 1
 
-            # cost, action = get_action(state)
-            mc, ec, cc, nc, action = get_action(state)
-            state_, reward, done = env.step(action)
-            # print(reward)
+        if total_step > 100000:
+            break
 
-            m_cost += mc
-            e_cost += ec
-            c_cost += cc
-            n_cost += nc
-
-            state = state_
-            if done:
-                break
-
-        mobile_costs.append(m_cost)
-        edge_costs.append(e_cost)
-        cloud_costs.append(c_cost)
-        naive_costs.append(n_cost)
-        if not episode % AGGREGATE_STATS_EVERY or episode == 1:
-            m_avg = sum(mobile_costs[-AGGREGATE_STATS_EVERY:]) / len(mobile_costs[-AGGREGATE_STATS_EVERY:])
-            m_save([episode, m_avg])
-
-            e_avg = sum(edge_costs[-AGGREGATE_STATS_EVERY:]) / len(edge_costs[-AGGREGATE_STATS_EVERY:])
-            e_save([episode, e_avg])
-
-            c_avg = sum(cloud_costs[-AGGREGATE_STATS_EVERY:]) / len(cloud_costs[-AGGREGATE_STATS_EVERY:])
-            c_save([episode, c_avg])
-
-            n_avg = sum(naive_costs[-AGGREGATE_STATS_EVERY:]) / len(naive_costs[-AGGREGATE_STATS_EVERY:])
-            n_save([episode, n_avg])
-
-    # save_to_file(RL.q_table)
     print("complete")
     # print(stats)
 
 
 if __name__ == '__main__':
-    num_of_episodes = 12000
+    num_of_episodes = 200
 
     env = Environment()
+    state_gen = read_state_from_file()
 
-    update(env, episodes=num_of_episodes)
+    mobile_exec = 0
+    mobile_energy = 0
+    mobile_miss_dt = 0
+    edge_exec = 0
+    edge_energy = 0
+    edge_miss_dt = 0
+    edge_prices = 0
+    cloud_exec = 0
+    cloud_energy = 0
+    cloud_miss_dt = 0
+    cloud_prices = 0
+    naive_exec = 0
+    naive_energy = 0
+    naive_miss_dt = 0
+    naive_prices = 0
+
+    update(state_gen)
+
+    print("mobile-time: ", mobile_energy)
+    print("mobile-energy: ", mobile_exec)
+    print("mobile-deadline: ", mobile_miss_dt)
+
+    print("edge-time: ", edge_exec)
+    print("edge-energy: ", edge_energy)
+    print("edge-deadline: ", edge_miss_dt)
+    print("edge-price: ", edge_prices)
+
+    print("cloud-time: ", cloud_exec)
+    print("cloud-energy: ", cloud_energy)
+    print("cloud-deadline: ", cloud_miss_dt)
+    print("cloud-prices: ", cloud_prices)
+
+    print("naive-time: ", naive_exec)
+    print("naive-energy: ", naive_energy)
+    print("naive-deadline: ", naive_miss_dt)
+    print("naive-price: ", naive_prices)

@@ -19,7 +19,7 @@ class Edge:
         return tr_time
 
     def cal_transmit_energy(self, data):
-        tr_energy = self.tr_power * self.cal_transmit_time(data) + self.tail_latency_energy * self.tail_duration
+        tr_energy = self.tr_power * self.cal_transmit_time(data) + self.tail_latency_energy * 2
         # tr_energy = self.tr_power * self.cal_transmit_time(data)
         return tr_energy
 
@@ -53,7 +53,7 @@ class Edge:
             time = edge_tr_time + proc_time
             energy_impact = energy + energy * energy_factor
             total = (1 - weight) * time + weight * energy_impact + money
-            return total, time, energy
+            return total, time, energy, money
         else:
             cloud = Cloud(self.uplink_rate)
             cloud_tr_time = cloud.cal_transmit_from_edge(data)
@@ -62,7 +62,7 @@ class Edge:
             time = edge_tr_time + cloud_tr_time + proc_time
             energy_impact = energy + energy * energy_factor
             total = (1 - weight) * time + weight * energy_impact + money
-            return total, time, energy
+            return total, time, energy, money
 
     def cal_total_cost_naive(self, data, cpu_cycle, weight):
         edge_tr_time = self.cal_transmit_time(data)
@@ -71,14 +71,11 @@ class Edge:
         money = self.cal_price(proc_time)
         time = edge_tr_time + proc_time
         total = (1 - weight) * time + weight * energy + money
-        return total, time, energy
+        return total, time, energy, money
 
 
 if __name__ == '__main__':
-    edge = Edge(7000000, 0.6)
-    for u in range(7, 12):
-        u_rate = u * 1000000
-        for cap in [0.2, 0.4, 0.6, 0.8, 1]:
-            edge = Edge(u_rate, cap)
-            job = task.get_fixed_task()
-            print(edge.cal_total_cost(job['data'], job['cpu_cycle'], 0.5, 0))
+    for cap in [0.2, 0.4, 0.6, 0.8, 1]:
+        edge = Edge(7000000, cap)
+        job = task.get_fixed_task()
+        print(edge.cal_total_cost(job['data'], job['cpu_cycle'], 0.5, 0))

@@ -32,13 +32,13 @@ REPLAY_MEMORY_SIZE = 10000  # How many last steps to keep for model training
 MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 50  # Terminal states (end of episodes)
-MODEL_NAME = 'dqn-lstm'
+MODEL_NAME = 'dqn-lstm-rms-1e-3'
 MIN_REWARD = -500  # For model save
 MEMORY_FRACTION = 0.20
 LEARNING_RATE = 0.001
 
 # Environment settings
-EPISODES = 12000
+EPISODES = 50000
 
 # Exploration settings
 epsilon = 1  # not a constant, going to be decayed
@@ -52,12 +52,12 @@ SHOW_PREVIEW = False
 env = Environment()
 
 # For stats
-ep_rewards = [-1200]
+ep_rewards = [-1000]
 
 # For more repetitive results
-random.seed(1)
-np.random.seed(1)
-tf.set_random_seed(1)
+# random.seed(1)
+# np.random.seed(1)
+# tf.set_random_seed(1)
 
 # Memory fraction, used mostly when trai8ning multiple agents
 # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=MEMORY_FRACTION)
@@ -116,6 +116,7 @@ class DQNLSTMAgent:
         self.n_actions = action_size
 
         if os.path.exists(model_file):
+            print("Loaded saved model")
             self.model = load_model(model_file)
             self.target_model = load_model(model_file)
         else:
@@ -214,7 +215,7 @@ class DQNLSTMAgent:
         # print("Training y: ", y.shape)
         # X = np.array(X).reshape(64, 7)
         # Fit on all samples as one batch, log only on terminal state
-        self.model.fit(X, y, batch_size=MINIBATCH_SIZE, epochs=5, verbose=0, shuffle=False,
+        self.model.fit(X, y, batch_size=MINIBATCH_SIZE, epochs=10, verbose=0, shuffle=False,
                        callbacks=[self.tensorboard] if terminal_state else None)
 
         # Update target network counter every episode
@@ -237,7 +238,7 @@ class DQNLSTMAgent:
         return predict
 
 
-# RUN program starts here.
+# Main program starts here.
 agent = DQNLSTMAgent(7, 3)
 # print(agent.model.summary())
 # Iterate over episodes
@@ -260,8 +261,6 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
     # Reset environment and get initial state
     current_state = env.reset()
-    # print(current_state)
-    # total_states.append(str(current_state))
 
     current_state = np.asarray(current_state)
 
@@ -314,8 +313,8 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
     if not episode % AGGREGATE_STATS_EVERY or episode == 1:
         average_reward = sum(ep_rewards[-AGGREGATE_STATS_EVERY:]) / len(ep_rewards[-AGGREGATE_STATS_EVERY:])
         min_reward = min(ep_rewards[-AGGREGATE_STATS_EVERY:])
-        max_reward = max(ep_rewards[-AGGREGATE_STATS_EVERY:])
-        agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward,
+        deadline = env.missed_deadline
+        agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, deadline=deadline,
                                        epsilon=epsilon)
 
         # # Save model, but only when min reward is greater or equal a set value
@@ -326,10 +325,17 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
     if epsilon > MIN_EPSILON:
         epsilon *= EPSILON_DECAY
         epsilon = max(MIN_EPSILON, epsilon)
+    print(f"Step {total_step}/100000\n")
+    # iterate for 100k data, not just episode
+    if total_step >= 100000:
+        break
 
 agent.model.save(f'models/{MODEL_NAME}.model')
 print("Total Steps: ", total_step)
 print("Missed deadline: ", env.missed_deadline)
+print("Total Execution Time: ", env.exe_delay)
+print("Total Energy cost: ", env.tot_energy_cost)
+print("Total Money for offloading: ", env.tot_off_cost)
 # print(total_states)
 # csv_writer(total_states)
 
