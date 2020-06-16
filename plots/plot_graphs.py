@@ -39,7 +39,7 @@ def plot_bars():
     plt.show()
 
 
-plot_bars()
+#plot_bars()
 
 
 def draw_comparisons():
@@ -87,14 +87,14 @@ def draw_losses():
     fig = plt.figure()
     # legends = []
     # files = glob.glob("../data/reward-lr-0.001-*.csv")
-    files = ['../data/reward.csv', '../data/reward-r.csv']
+    files = ['../data/loss-r.csv', '../data/loss-rms-1e-5.csv']
 
     x = []
     y = []
     for i, file in enumerate(files):
         # draw_picture(file)
         df = pd.read_csv(file)
-        df1 = df[:1000]
+        df1 = df[:200]
         print(df1.shape)
         x.append(df1['Step'])
         y1 = df1['Value']
@@ -108,8 +108,8 @@ def draw_losses():
         # # plt.legend("lr-" + str(m.group(1)))
         # sns.lineplot(x,ysm)
 
-    plt.plot(x[0], y[0], linestyle='-.', label='1e-4')
-    plt.plot(x[1], y[1], linestyle='-', label='1e-4 v2')
+    plt.plot(x[0], y[0], linestyle='-.', label='1e-3')
+    plt.plot(x[1], y[1], linestyle='-', label='1e-5')
     # plt.plot(x[2], y[2], linestyle='--', label='1e-5')
     # plt.plot(x[3], y[3], linestyle='-', label='0.00001-100')
     # plt.plot(x[4], y[4], linestyle='-.', label='Cloud')
@@ -118,23 +118,10 @@ def draw_losses():
     plt.xlabel("Episodes")
     plt.ylabel("Value")
     plt.title("Loss Function")
-    # plt.savefig("loss-comparison.png")
+    plt.savefig("loss-comparison.png")
     plt.show()
-
-
-def state_generation():
-    df1 = pd.read_csv('../data/state-trace.csv')
-    df2 = pd.read_csv('../data/state-trace-0.01.csv')
-    df3 = pd.read_csv('../data/state-trace-0.01-n.csv')
-    df4 = pd.read_csv('../data/state-trace-0.001.csv')
-    df5 = pd.read_csv('../data/state-trace-0.001-n.csv')
-    df6 = pd.concat([df1, df2, df3, df4, df5], sort=False)
-    # df.to_csv('../data/states.csv', index=False)
-    df6 = df6.drop_duplicates()
-    print(df6.shape)
-    df6.to_csv("../data/states.csv", header=False, index=False)
 
 # draw_picture()
 # draw_comparisons()
 # state_generation()
-#draw_losses()
+draw_losses()
