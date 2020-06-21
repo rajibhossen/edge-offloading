@@ -7,6 +7,7 @@ class Mobile:
         self.esc = parameter["esc"]  # effective switched capacitance
         self.computing_capability = parameter['mobile_com_cap']
         self.limited_capability = parameter['mobile_com_cap'] * mobile_cap
+        self.w1 = parameter['w1']
 
     def calculate_time(self, cpu_cycle):
         time = cpu_cycle / self.limited_capability
@@ -16,17 +17,17 @@ class Mobile:
         energy = self.esc * (self.computing_capability ** 2) * cpu_cycle
         return energy
 
-    def calculate_total_cost(self, cpu_cycle, weight, energy_factor):
+    def calculate_total_cost(self, cpu_cycle):
         time = self.calculate_time(cpu_cycle)
         energy = self.calculate_energy(cpu_cycle)
-        energy_impact = energy + energy * energy_factor
-        total = (1 - weight) * time + weight * energy_impact
+        total = self.w1 * time + energy
+        #total = time + energy
         return total, time, energy
 
-    def calculate_cost_naive(self, cpu_cycle, weight):
+    def calculate_cost_naive(self, cpu_cycle):
         time = self.calculate_time(cpu_cycle)
         energy = self.calculate_energy(cpu_cycle)
-        total = (1 - weight) * time + weight * energy
+        total = self.w1 * time + energy
         return total, time, energy
 
 
@@ -34,7 +35,7 @@ if __name__ == '__main__':
     for cap in [0.2, 0.4, 0.6, 0.8, 1]:
         mobile = Mobile(cap)
         job = task.get_fixed_task()
-        print(mobile.calculate_total_cost(job['cpu_cycle'], 0.5, 0))
+        print(mobile.calculate_total_cost(job['cpu_cycle']))
 
     # for app in task.applications:
     #     job = task.make_task_from_applications(app)

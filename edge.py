@@ -10,9 +10,10 @@ class Edge:
         self.tail_latency_energy = parameter['tail_energy']
         self.tail_duration = parameter["tail_duration"]
         self.uplink_rate = uplink_rate
-        self.execution_cap = parameter["edge_com_cap"] * utilization
+        self.execution_cap = parameter["edge_com_cap"] * utilization * 1.3
         self.server_utilization = utilization
-        self.price = parameter["cph_edge"]
+        self.w1 = parameter['w1']
+        self.w2 = parameter['w2']
 
     def cal_transmit_time(self, data):
         tr_time = data / self.uplink_rate
@@ -29,30 +30,24 @@ class Edge:
         return proc_time
 
     def cal_price(self, proc_time):
-        expense = proc_time * self.price
+        expense = proc_time * parameter['edge_cps'] + parameter['edge_request']
         return expense
 
-    def cal_total_cost(self, data, cpu_cycle, weight, energy_factor):
+    def cal_total_cost(self, data, cpu_cycle):
         """
         if utilization is less than 50%, process here, otherwise offload to cloud by 2x.
         if utilization = 0.6, 0.6-0.5 = 0.1*2 = 20% chance to offload in cloud
-        :param data:
-        :param cpu_cycle:
-        :param weight:
-        :param energy_factor:
-        :return:
         """
         edge_tr_time = self.cal_transmit_time(data)
         energy = self.cal_transmit_energy(data)
 
         process_here = self.server_utilization - 0.5
 
-        if random.uniform(0, 1) > (2 * process_here):
+        if random.uniform(0, 1) >= (2 * process_here):
             proc_time = self.cal_processing_time(cpu_cycle)
             money = self.cal_price(proc_time)
             time = edge_tr_time + proc_time
-            energy_impact = energy + energy * energy_factor
-            total = (1 - weight) * time + weight * energy_impact + money
+            total = self.w1 * time + self.w2 * money + energy
             return total, time, energy, money
         else:
             cloud = Cloud(self.uplink_rate)
@@ -60,17 +55,17 @@ class Edge:
             proc_time = cloud.cal_processing_time(cpu_cycle)
             money = cloud.cal_price(proc_time)
             time = edge_tr_time + cloud_tr_time + proc_time
-            energy_impact = energy + energy * energy_factor
-            total = (1 - weight) * time + weight * energy_impact + money
+            total = self.w1 * time + self.w2 * money + energy
             return total, time, energy, money
 
-    def cal_total_cost_naive(self, data, cpu_cycle, weight):
+    def cal_total_cost_naive(self, data, cpu_cycle):
         edge_tr_time = self.cal_transmit_time(data)
         energy = self.cal_transmit_energy(data)
         proc_time = self.cal_processing_time(cpu_cycle)
         money = self.cal_price(proc_time)
         time = edge_tr_time + proc_time
-        total = (1 - weight) * time + weight * energy + money
+        total = self.w1 * time + self.w2 * money + energy
+        # total = time + money + energy
         return total, time, energy, money
 
 
@@ -78,4 +73,4 @@ if __name__ == '__main__':
     for cap in [0.2, 0.4, 0.6, 0.8, 1]:
         edge = Edge(7000000, cap)
         job = task.get_fixed_task()
-        print(edge.cal_total_cost(job['data'], job['cpu_cycle'], 0.5, 0))
+        print(edge.cal_total_cost(job['data'], job['cpu_cycle']))

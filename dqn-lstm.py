@@ -41,7 +41,7 @@ LEARNING_RATE = 0.001
 EPISODES = 50000
 
 # Exploration settings
-epsilon = 0.05  # not a constant, going to be decayed
+epsilon = 1  # not a constant, going to be decayed
 EPSILON_DECAY = 0.99975
 MIN_EPSILON = 0.05
 
@@ -52,12 +52,12 @@ SHOW_PREVIEW = False
 env = Environment()
 
 # For stats
-ep_rewards = [-1000]
+ep_rewards = [-500]
 
 # For more repetitive results
-random.seed(1)
-np.random.seed(1)
-tf.set_random_seed(1)
+# random.seed(1)
+# np.random.seed(1)
+# tf.set_random_seed(1)
 
 # Memory fraction, used mostly when trai8ning multiple agents
 # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=MEMORY_FRACTION)
@@ -261,7 +261,6 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
     # Reset environment and get initial state
     current_state = env.reset()
-
     current_state = np.asarray(current_state)
 
     current_state = normalize(current_state)
@@ -313,8 +312,8 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
     if not episode % AGGREGATE_STATS_EVERY or episode == 1:
         average_reward = sum(ep_rewards[-AGGREGATE_STATS_EVERY:]) / len(ep_rewards[-AGGREGATE_STATS_EVERY:])
         min_reward = min(ep_rewards[-AGGREGATE_STATS_EVERY:])
-        deadline = env.missed_deadline
-        agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, deadline=deadline,
+        max_reward = max(ep_rewards[-AGGREGATE_STATS_EVERY:])
+        agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward,
                                        epsilon=epsilon)
 
         # # Save model, but only when min reward is greater or equal a set value
@@ -322,17 +321,16 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         #     agent.model.save(f'models/{MODEL_NAME}.model')
 
     # Decay epsilon
-    # if epsilon > MIN_EPSILON:
-    #     epsilon *= EPSILON_DECAY
-    #     epsilon = max(MIN_EPSILON, epsilon)
+    if epsilon > MIN_EPSILON:
+        epsilon *= EPSILON_DECAY
+        epsilon = max(MIN_EPSILON, epsilon)
     print(f"Step {total_step}/100000\n")
     # iterate for 100k data, not just episode
-    if total_step >= 100000:
+    if total_step >= 10:
         break
 
 agent.model.save(f'models/{MODEL_NAME}.model')
 print("Total Steps: ", total_step)
-print("Missed deadline: ", env.missed_deadline)
 print("Total Execution Time: ", env.exe_delay)
 print("Total Energy cost: ", env.tot_energy_cost)
 print("Total Money for offloading: ", env.tot_off_cost)

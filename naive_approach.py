@@ -9,7 +9,7 @@ from generate_states import read_state_from_file
 from mobile import Mobile
 
 matplotlib.style.use('ggplot')
-
+import numpy as np
 
 # For stats
 
@@ -17,29 +17,33 @@ matplotlib.style.use('ggplot')
 def calculate_costs(state):
     data = state[0]
     cpu_cycle = state[1]
-    dt = state[2]
-    uplink_rate = state[3]
-    mobile_cap = state[4]
-    server_cap = state[5]
-    energy_left = state[6]
+    uplink_rate = state[2]
+    mobile_cap = state[3]
+    server_cap = state[4]
+    energy_left = state[5]
     global mobile_energy, mobile_exec, edge_energy, edge_exec, cloud_energy, \
         cloud_exec, naive_energy, naive_exec, mobile_miss_dt, edge_miss_dt, \
         cloud_miss_dt, naive_miss_dt, edge_prices, cloud_prices, naive_prices
-    energy_factor = energy_left / 340
-    energy_factor = 1 - energy_factor
 
     device = Mobile(mobile_cap)
-    m_total, m_time, m_energy = device.calculate_total_cost(cpu_cycle, 0.7, energy_factor)
-    # print(m_energy)
+    m_total, m_time, m_energy = device.calculate_total_cost(cpu_cycle)
     edge = Edge(uplink_rate, server_cap)
-    e_total, e_time, e_energy, e_price = edge.cal_total_cost(data, cpu_cycle, 0.7, energy_factor)
+    e_total, e_time, e_energy, e_price = edge.cal_total_cost(data, cpu_cycle)
+    #print(e_time, e_energy, e_price)
     cloud = Cloud(uplink_rate)
-    c_total, c_time, c_energy, c_price = cloud.cal_total_cost(data, cpu_cycle, 0.7, energy_factor)
-
+    c_total, c_time, c_energy, c_price = cloud.cal_total_cost(data, cpu_cycle)
+    #print(m_total, e_total, c_total)
+    # naive greedy algorithms action choice
     costs = [m_total, e_total, c_total]
-    # get minimum cost action
-    action = costs.index(min(costs))
+    # # get minimum cost action
+    best = costs.index(min(costs))
+    best_options[best] += 1
+    if uplink_rate > 8000000 and server_cap < 0.5:
+        action = 1
+    else:
+        action = np.random.choice([0, 2])
 
+    # print(action)
     mobile_exec += m_time
     mobile_energy += m_energy
     if m_time > dt:
@@ -116,6 +120,11 @@ if __name__ == '__main__':
     naive_energy = 0
     naive_miss_dt = 0
     naive_prices = 0
+    best_options = {
+        0: 0,
+        1: 0,
+        2: 0
+    }
 
     update(state_gen)
 
@@ -137,3 +146,5 @@ if __name__ == '__main__':
     print("naive-energy: ", naive_energy)
     print("naive-deadline: ", naive_miss_dt)
     print("naive-price: ", naive_prices)
+
+    print(best_options)

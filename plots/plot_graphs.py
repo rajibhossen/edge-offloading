@@ -25,24 +25,26 @@ def draw_picture(filename):
 def plot_bars():
     fig = plt.figure()
     # ax = fig.add_axes([0, 0, 1, 1])
-    algo = ['DQN', 'All Mobile', 'All Edge', 'All Cloud', 'Naive']
+    algo = ['All Mobile', 'All Edge', 'All Cloud', 'Naive']
     # total execution data
-    execution_delay = [1533707.903024052, 13518874.000179151, 3142864.171568715, 2424207.0244918857, 1862416.8062593315]
-    total_energies = [634557.0049511091, 1749465.1073236275, 344369.881719523, 456869.8817195224, 384392.8817195243]
+    execution_delay = [13518874.000179151, 3055013.0161278867, 3205603.9454013384, 3062494.8857348566]
+    total_energies = [634557.0049511091, 1749465.1073236275, 344369.881719523, 456869.8817195224, 4267063.307657191]
     money = [309192.8942792864, 0, 543018.6633310195, 191984.009469998, 224254.14633212643]
     missed_deadlines = [9751, 20837, 29641, 14280, 5895]
+    execution_delay[:] = [x / 100000.0 for x in execution_delay]
+
     plt.bar(algo, execution_delay)
     plt.xlabel("Algorithms")
     plt.ylabel("Total Execution Delay (Sec)")
     plt.title("Total Execution Delay Comparison of Algorithms")
-    plt.savefig("execution-time-comparison.png")
+    # plt.savefig("execution-time-comparison.png")
     # plt.ylabel("Total Offloading Cost (USD)")
     # plt.title("Total Offloading Cost Comparison of Algorithms")
-    # plt.savefig("off-price-comparison.png")
+    plt.savefig("off-price-comparison1.png")
     plt.show()
 
 
-#plot_bars()
+plot_bars()
 
 
 def draw_comparisons():
@@ -97,7 +99,7 @@ def draw_losses():
     for i, file in enumerate(files):
         # draw_picture(file)
         df = pd.read_csv(file)
-        df1 = df[:200]
+        df1 = df[:1500]
         print(df1.shape)
         x.append(df1['Step'])
         y1 = df1['Value']
@@ -127,4 +129,4 @@ def draw_losses():
 # draw_picture()
 # draw_comparisons()
 # state_generation()
-draw_losses()
+# draw_losses()

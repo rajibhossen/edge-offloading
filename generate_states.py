@@ -1,12 +1,10 @@
 import csv
 import itertools
-
-from task import get_random_task
-from system_parameters import parameter
 import random
-import numpy as np
-import itertools
 
+import numpy as np
+
+from system_parameters import parameter
 
 def cal_uplink_rate():
     # generate a uplink rate in 7-10 Mbps range
@@ -29,45 +27,39 @@ def get_server_availability():
     # return random.uniform(0, 1)
 
 
-def get_energy_availability():
-    energies = [342, 300, 250, 200, 150, 100, 50]
-    return np.random.choice(energies)
+def get_initial_state(state_generator, battery_obj):
+    new_state = next(state_generator)
+    battery_level = battery_obj.set_battery_level(new_state[0])
+    new_state.append(battery_level)
+    return new_state
 
 
-def get_initial_state():
-    uplink_rate = cal_uplink_rate()
-    mobile_cap = get_mobile_availability()
-    server_cap = get_server_availability()
-    energy = parameter["total_energy"]  # initial energy level wh, 3110 mAh battery with 110 V voltage
-    task = get_random_task()
-    state = [task['data'], task['cpu_cycle'], task['dt'], uplink_rate, mobile_cap, server_cap, energy]
-    return state
-
-
-def get_next_state():
-    pass
-
-
-def energy_gen():
-    energy = 340
-    while True:
-        yield energy
-        energy -= 30
-        if energy < 70:
-            energy = 340
+def get_next_state(state_gen, battery_obj):
+    new_state = next(state_gen)
+    battery_level = battery_obj.get_battery_level(new_state[0])
+    new_state.append(battery_level)
+    return new_state
 
 
 def generate_state_trace():
+    edge_trace = {}
+    with open('data/edge_trace.csv') as f:
+        for line in f:
+            (key, val) = line.split(",")
+            edge_trace[int(key)] = float(val)
+
     states = []
-    gen = energy_gen()
     final_i = 1
+    minutes = 0
     for i in itertools.count():
+        minutes += random.expovariate(1 / 5.0)
         data = random.randint(8388608, 33554432)  # 1MB  - 4MB
         cpu_cycle = random.randint(10000e6, 30000e6)  # 10k-30k Mega Cycles
         delay = 30  # 10s in each application
         uplink_rate = cal_uplink_rate()
         mobile_cap = get_mobile_availability()
-        row = [data, cpu_cycle, delay, uplink_rate, mobile_cap, next(gen)]
+        edge_cap = edge_trace[int(minutes / 60)]
+        row = [minutes, data, cpu_cycle, uplink_rate, mobile_cap, edge_cap]
         if row in states:
             print("skipping duplicates")
             continue
@@ -80,7 +72,7 @@ def generate_state_trace():
     with open('data/state_trace.csv', 'w+', newline='') as file:
         writer = csv.writer(file)
         for num, item in enumerate(states):
-            item.insert(0, num + 1)
+            # item.insert(0, num + 1)
             writer.writerow(item)
 
 
@@ -98,21 +90,26 @@ def state_generator():
 
 def read_state_from_file():
     state_gen = state_generator()
-    edge_gen = edge_generator()
     while True:
         state = next(state_gen)
-        edge_trace = next(edge_gen)
         state = state.split(',')
-        edge_trace = edge_trace.split(',')
         state = [float(item) for item in state]
-        edge_trace = [float(item) for item in edge_trace]
-        state.append(edge_trace[1])
-        final_state = [state[1], state[2], state[3]-5, state[4], state[5], state[7], state[6]]
+        final_state = [state[0], state[1], state[2], state[3], state[4], state[5]]
         yield final_state
+
+
+def poisson_job_arrival():
+    minutes = 0
+    for i in range(100000):
+        minutes += random.expovariate(1 / 5.0)
+        # print(int(minutes / 60))
+        print(minutes / 60)
 
 
 if __name__ == '__main__':
     # result = read_state_from_file()
     # for i in range(10):
     #     print(next(result))
+
     generate_state_trace()
+    # poisson_job_arrival()
