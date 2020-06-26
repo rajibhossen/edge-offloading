@@ -6,8 +6,9 @@ import numpy as np
 
 from system_parameters import parameter
 
+
 def cal_uplink_rate():
-    # generate a uplink rate in 7-10 Mbps range
+    # generate a uplink rate in 7-12 Mbps range
     rate = np.random.randint(7, 12)
     rate *= 1000000  # in bit per sec
     return rate
@@ -18,13 +19,6 @@ def get_mobile_availability():
     availability = [0.2, 0.4, 0.6, 0.8, 1.0]
     return np.random.choice(availability)
     # return random.uniform(0.5, 1)
-
-
-def get_server_availability():
-    # generate edge server availability in 0-100%
-    availability = [0.2, 0.4, 0.6, 0.8, 1.0]
-    return np.random.choice(availability)
-    # return random.uniform(0, 1)
 
 
 def get_initial_state(state_generator, battery_obj):
@@ -55,7 +49,6 @@ def generate_state_trace():
         minutes += random.expovariate(1 / 5.0)
         data = random.randint(8388608, 33554432)  # 1MB  - 4MB
         cpu_cycle = random.randint(10000e6, 30000e6)  # 10k-30k Mega Cycles
-        delay = 30  # 10s in each application
         uplink_rate = cal_uplink_rate()
         mobile_cap = get_mobile_availability()
         edge_cap = edge_trace[int(minutes / 60)]

@@ -25,6 +25,8 @@ class Environment(gym.Env):
         self.exe_delay = 0
         self.tot_energy_cost = 0
         self.tot_off_cost = 0
+        self.total_cost = 0
+        self.off_decisions = {0: 0, 1: 0, 2: 0}
 
     def render(self, mode='human'):
         pass
@@ -43,6 +45,8 @@ class Environment(gym.Env):
         server_cap = self.state[5]
         energy_assign = self.state[6]
 
+        self.off_decisions[action] += 1
+
         device = Mobile(mobile_cap)
         m_total, m_time, m_energy = device.calculate_total_cost(cpu_cycle)
         if action == 0:  # local computing
@@ -54,6 +58,7 @@ class Environment(gym.Env):
             cloud = Cloud(uplink_rate)
             computing_cost, execution_delay, energy_used, off_price = cloud.cal_total_cost(data, cpu_cycle)
 
+        self.total_cost += computing_cost
         self.exe_delay += execution_delay
         self.tot_energy_cost += energy_used
         self.tot_off_cost += off_price
@@ -91,7 +96,7 @@ class Environment(gym.Env):
         done = False
 
         # scaled_reward = (m_total - computing_cost) / m_total * 1.0
-
+        print("Total: %f (t-%f, e-%f, m-%f)" % (computing_cost, execution_delay, energy_used, off_price))
         if energy_left < self.threshold_energy:
             # reward = -computing_cost
             reward = parameter['max_penalty']

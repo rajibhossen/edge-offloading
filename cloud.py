@@ -15,6 +15,7 @@ class Cloud:
         self.execution_cap = parameter['cloud_com_cap'] * parameter["cloud_cap"]
         self.w1 = parameter['w1']
         self.w2 = parameter['w2']
+        self.w3 = parameter['w3']
 
     def cal_propagation_delay(self):
         # delay = self.distance / self.propagation_speed
@@ -33,7 +34,7 @@ class Cloud:
         tr_time = data / self.uplink_rate
         tr_time += tr_time  # from mobile to edge and then edge to cloud. so, transmit time is twice.
         tr_time += self.cal_propagation_delay()
-        tr_time += np.random.randint(19, 24)  # queuing delay
+        tr_time += np.random.randint(5, 10)  # queuing delay
         return tr_time
 
     def cal_transmit_from_edge(self, data):
@@ -61,7 +62,7 @@ class Cloud:
         energy = self.cal_transmit_energy(data)
         money = self.cal_price(proc_time)
         time = tr_time + proc_time
-        total = self.w1 * time + self.w2 * money + energy
+        total = self.w1 * time + self.w2 * energy + self.w3 * money
         return total, time, energy, money
 
     def cal_total_cost_naive(self, data, cpu_cycle):
@@ -70,8 +71,8 @@ class Cloud:
         energy = self.cal_transmit_energy(data)
         money = self.cal_price(proc_time)
         time = tr_time + proc_time
-        total = self.w1 * time + self.w2 * money + energy
-        #total = time + money + energy
+        total = self.w1 * time + self.w2 * energy + money * self.w3
+        # total = time + money + energy
         return total, time, energy, money
 
 
