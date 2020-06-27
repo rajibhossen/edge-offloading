@@ -24,7 +24,7 @@ class Mobile:
     def calculate_total_cost(self, cpu_cycle):
         time = self.calculate_time(cpu_cycle)
         energy = self.calculate_energy(cpu_cycle)
-        total = self.w1 * time + energy
+        total = self.w1 * time + self.w2 * energy
         return total, time, energy
 
     def calculate_cost_naive(self, cpu_cycle):

@@ -72,7 +72,6 @@ class Cloud:
         money = self.cal_price(proc_time)
         time = tr_time + proc_time
         total = self.w1 * time + self.w2 * energy + money * self.w3
-        # total = time + money + energy
         return total, time, energy, money
 
 

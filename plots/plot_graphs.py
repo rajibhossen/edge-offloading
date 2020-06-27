@@ -25,30 +25,30 @@ def draw_picture(filename):
 def plot_bars():
     fig = plt.figure()
     # ax = fig.add_axes([0, 0, 1, 1])
-    algo = ['DQN', 'All Mobile', 'All Edge', 'All Cloud']
+    algo = ['DQN', 'All Mobile', 'All Edge', 'All Cloud', 'Greedy']
     # algo = ['Mobile', 'edge', 'cloud']
     # total execution data
-    total_costs = [853877.8109096679, 1843791.9431004354, 854527.8870487701, 1387275.1118702085, 1876140.207958618]
-    execution_delay = [1327979.0580992065, 1759315.186377037, 1268815.8398182227, 1807127.7957468317]
-    total_energies = [363194.5357972589, 1349325.60513362617, 344667.77279109217, 457260.95516604016]
-    money = [15868.851058761718, 0, 19351.674545038517, 3533.7841522259473]
+    total_costs = [184311.45198231575, 359041.878701425, 171522.4394385646, 189282.42264744863, 166156.76108757418]
+    execution_delay = [266891.992916002, 350457.72138229763, 254668.19884885458, 362504.1459842049, 259899.52256641316]
+    total_energies = [84003.29122426435, 271427.4483558506, 69039.00180737283, 91565.64354255877, 75408.20467287282]
+    money = [3358.516252905033, 0, 3881.638791897804, 709.0742608838378, 2577.367577309831]
     execution_delay[:] = [x / 100000.0 for x in execution_delay]
     total_energies[:] = [x / 100000.0 for x in total_energies]
     money[:] = [x / 100000.0 for x in money]
     total_costs[:] = [x / 100000.0 for x in total_costs]
     weights = []
-    print(execution_delay)
-    print(total_energies)
-    print(money)
+    # print(execution_delay)
+    # print(total_energies)
+    # print(money)
     # print(total_costs)
-    plt.bar(algo, money)
+    plt.bar(algo, total_energies)
     plt.xlabel("Algorithms")
     plt.ylabel("Average Execution Delay (Sec)")
     plt.title("Average Execution Delay Comparison of Algorithms")
-    #plt.savefig("execution-delay-comparison.png")
+    # plt.savefig("execution-delay-comparison.png")
     # plt.ylabel("Total Offloading Cost (USD)")
     # plt.title("Total Offloading Cost Comparison of Algorithms")
-    #plt.savefig("off-price-compariso1.png")
+    # plt.savefig("off-price-compariso1.png")
     plt.show()
 
 

@@ -28,7 +28,7 @@ else:
     print("not in gpu")
 
 DISCOUNT = 0.90
-REPLAY_MEMORY_SIZE = 100000  # How many last steps to keep for model training
+REPLAY_MEMORY_SIZE = 20000  # How many last steps to keep for model training
 MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 50  # Terminal states (end of episodes)
@@ -318,11 +318,12 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
     # Decay epsilon
     if epsilon > MIN_EPSILON:
-        epsilon *= EPSILON_DECAY
+        epsilon /= 3
+        # epsilon *= EPSILON_DECAY
         epsilon = max(MIN_EPSILON, epsilon)
     print(f"Step {total_step}/100000\n")
     # iterate for 100k data, not just episode
-    if total_step >= 100000:
+    if total_step >= 20000:
         break
 
 agent.model.save(f'models/{MODEL_NAME}.model')
