@@ -1,7 +1,7 @@
 parameter = {
     "esc": 1e-28,  # effective switch capacitance
-    "w1": 0.25,  # weight factor for time 0.28
-    "w2": 1,  # weight factor for energy 120
+    "w1": 0.25,  # weight factor for time 0.25
+    "w2": 1,  # weight factor for energy 10
     "w3": 10,  # weight factor for money, only two will have impact
     "edge_cps": 0.01 * 2,  # lambda@edge in cents, each request $0.0001 per GB-s, total 2GB
     "edge_request": 6e-5,  # edge request price in cents, $0.6 per 1M

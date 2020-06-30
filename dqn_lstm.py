@@ -28,11 +28,11 @@ else:
     print("not in gpu")
 
 DISCOUNT = 0.90
-REPLAY_MEMORY_SIZE = 20000  # How many last steps to keep for model training
+REPLAY_MEMORY_SIZE = 2000  # How many last steps to keep for model training
 MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 50  # Terminal states (end of episodes)
-MODEL_NAME = 'dqn-lstm-rms-1e-3'
+MODEL_NAME = 'dqn-lstm-rms-1e-3(20k)'
 MIN_REWARD = -500  # For model save
 MEMORY_FRACTION = 0.20
 LEARNING_RATE = 0.001

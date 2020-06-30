@@ -25,13 +25,20 @@ def draw_picture(filename):
 def plot_bars():
     fig = plt.figure()
     # ax = fig.add_axes([0, 0, 1, 1])
-    algo = ['DQN', 'All Mobile', 'All Edge', 'All Cloud', 'Greedy']
+    algo = ['DQN', 'Greedy', 'All Edge', 'All Mobile', 'All Cloud']
     # algo = ['Mobile', 'edge', 'cloud']
     # total execution data
-    total_costs = [184311.45198231575, 359041.878701425, 171522.4394385646, 189282.42264744863, 166156.76108757418]
-    execution_delay = [266891.992916002, 350457.72138229763, 254668.19884885458, 362504.1459842049, 259899.52256641316]
-    total_energies = [84003.29122426435, 271427.4483558506, 69039.00180737283, 91565.64354255877, 75408.20467287282]
-    money = [3358.516252905033, 0, 3881.638791897804, 709.0742608838378, 2577.367577309831]
+
+    total_costs = [171046.9643922055, 166156.76108757418, 171522.4394385646, 359041.878701425, 189282.42264744863]
+    execution_delay = [246932.48422193376, 250630.36288031228, 254668.19884885458, 350457.72138229763,
+                       362504.1459842049]
+    total_energies = [68930.47869846618, 75408.20467287282, 69039.00180737283, 271427.4483558506, 91565.64354255877]
+    money = [2878.45051748448, 2977.367577309831, 3881.638791897804, 0, 709.0742608838378]
+
+    # total_costs = [326249.3218534179, 621885.1697381499, 327568.9100616688, 454383.4887876519, 327164.0669541478]
+    # execution_delay = [246932.48422193376, 350457.72138229763, 254652.81151009543, 362108.77098420705, 250630.36288031228]
+    # total_energies = [75961.4927169943, 271427.4483558506, 69039.00180737283, 91565.64354255877, 73364.95670569877]
+    # money = [3355.344914489943, 0, 3877.0967442000406, 709.0742608838378, 3168.747368135734]
     execution_delay[:] = [x / 100000.0 for x in execution_delay]
     total_energies[:] = [x / 100000.0 for x in total_energies]
     money[:] = [x / 100000.0 for x in money]
@@ -43,9 +50,9 @@ def plot_bars():
     # print(total_costs)
     plt.bar(algo, total_energies)
     plt.xlabel("Algorithms")
-    plt.ylabel("Average Execution Delay (Sec)")
-    plt.title("Average Execution Delay Comparison of Algorithms")
-    # plt.savefig("execution-delay-comparison.png")
+    plt.ylabel("Average Energy Cost (J)")
+    plt.title("Average Energy Comparison of Algorithms")
+    plt.savefig("energy-cost-comparison.png")
     # plt.ylabel("Total Offloading Cost (USD)")
     # plt.title("Total Offloading Cost Comparison of Algorithms")
     # plt.savefig("off-price-compariso1.png")
@@ -100,7 +107,7 @@ def draw_losses():
     fig = plt.figure()
     # legends = []
     # files = glob.glob("../data/reward-lr-0.001-*.csv")
-    files = ['../data/loss-1e-4.csv', '../data/loss-1e-7.csv']
+    files = ['../data/loss-1e-3.csv', '../data/loss-1e-4.csv', '../data/loss-1e-6.csv']
 
     x = []
     y = []
@@ -121,9 +128,9 @@ def draw_losses():
         # # plt.legend("lr-" + str(m.group(1)))
         # sns.lineplot(x,ysm)
 
-    plt.plot(x[0], y[0], linestyle='-.', label='1e-4')
-    plt.plot(x[1], y[1], linestyle='-', label='1e-7')
-    # plt.plot(x[2], y[2], linestyle='--', label='1e-5')
+    plt.plot(x[0], y[0], linestyle='-.', label='1e-3')
+    plt.plot(x[1], y[1], linestyle='-', label='1e-4')
+    plt.plot(x[2], y[2], linestyle='--', label='1e-6')
     # plt.plot(x[3], y[3], linestyle='-', label='0.00001-100')
     # plt.plot(x[4], y[4], linestyle='-.', label='Cloud')
 

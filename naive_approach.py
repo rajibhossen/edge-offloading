@@ -21,15 +21,14 @@ def get_naive_action(state):
     cloud = Cloud(uplink_r)
     cc, ct, ce, cp = cloud.cal_total_cost_naive(data, cpu_cycle)
 
-    if energy > 100: # battery is greater than certain percentage, consider edge, cloud
+    if energy > 60:  # battery is greater than certain percentage, consider edge, cloud
         action = 1 if ec < cc else 2
-    elif uplink_r > 90000 and edge_cap < 0.7: # good uplink rate and edge cap, consider edge and mobile
+    elif uplink_r > 90000 and edge_cap < 0.7:  # good uplink rate and edge cap, consider edge and mobile
         action = 1 if ec < mc else 0
-    else: # all other cases consider mobile and cloud
+    else:  # all other cases consider mobile and cloud
         action = 0 if mc < cc else 2
 
     return action
-
 
 
 def update(episodes):
@@ -41,7 +40,7 @@ def update(episodes):
             print("Episode [%d] Iteration: %d" % (episode, t))
 
             # time_id, data, cpu_cycle, uplink_r, mobile_cap, edge_cap, energy = state
-
+            #
             # mobile = Mobile(mobile_cap)
             # mc, mt, me = mobile.calculate_total_cost(cpu_cycle)
             # edge = Edge(uplink_r, edge_cap)
@@ -49,7 +48,8 @@ def update(episodes):
             # cloud = Cloud(uplink_r)
             # cc, ct, ce, cp = cloud.cal_total_cost(data, cpu_cycle)
             # total_costs = [mc, ec, cc]
-            # bests[total_costs.index(min(total_costs))] += 1
+
+           # bests[total_costs.index(min(total_costs))] += 1
             #
             # max_total = max(total_costs) if max(total_costs) > max_total else max_total
             #
@@ -60,7 +60,7 @@ def update(episodes):
             # total_m = [ep, cp]
             # best_money[total_m.index(min(total_m))] += 1
             # print(total_costs)
-
+            #action = total_costs.index(min(total_costs))
             action = get_naive_action(state)
             #action = 2
             state_, reward, done = env.step(action)
