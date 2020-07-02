@@ -5,7 +5,7 @@ from cloud import Cloud
 
 
 class Edge:
-    def __init__(self, uplink_rate, utilization):
+    def __init__(self, uplink_rate, utilization, off_from_edge):
         self.tr_power = parameter['tr_power']
         self.tail_latency_energy = parameter['tail_energy']
         self.uplink_rate = uplink_rate
@@ -14,6 +14,7 @@ class Edge:
         self.w1 = parameter['w1']
         self.w2 = parameter['w2']
         self.w3 = parameter['w3']
+        self.off_from_edge = off_from_edge
 
     def cal_transmit_time(self, data):
         tr_time = data / self.uplink_rate
@@ -48,7 +49,7 @@ class Edge:
             money = self.cal_price(proc_time)
             time = edge_tr_time + proc_time
             total = self.w1 * time + self.w2 * energy + self.w3 * money
-            return total, time, energy, money
+            return total, time, energy, money, self.off_from_edge
         else:
             cloud = Cloud(self.uplink_rate)
             cloud_tr_time = cloud.cal_transmit_from_edge(data)
@@ -56,7 +57,8 @@ class Edge:
             money = cloud.cal_price(proc_time)
             time = edge_tr_time + cloud_tr_time + proc_time
             total = self.w1 * time + self.w2 * energy + money * self.w3
-            return total, time, energy, money
+            self.off_from_edge += 1
+            return total, time, energy, money, self.off_from_edge
 
     def cal_total_cost_naive(self, data, cpu_cycle):
         edge_tr_time = self.cal_transmit_time(data)

@@ -32,7 +32,7 @@ REPLAY_MEMORY_SIZE = 2000  # How many last steps to keep for model training
 MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start training
 MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 50  # Terminal states (end of episodes)
-MODEL_NAME = 'dqn-lstm-rms-1e-3(20k)'
+MODEL_NAME = 'dqn-lstm-rms-1e-3(40k)'
 MIN_REWARD = -500  # For model save
 MEMORY_FRACTION = 0.20
 LEARNING_RATE = 0.001
@@ -323,7 +323,7 @@ for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
         epsilon = max(MIN_EPSILON, epsilon)
     print(f"Step {total_step}/100000\n")
     # iterate for 100k data, not just episode
-    if total_step >= 20000:
+    if total_step >= 40000:
         break
 
 agent.model.save(f'models/{MODEL_NAME}.model')
@@ -334,7 +334,8 @@ print("Total Execution Time: ", env.exe_delay)
 print("Total Energy cost: ", env.tot_energy_cost)
 print("Total Money for offloading: ", env.tot_off_cost)
 with open("data/iteration-costs.txt", "a+") as file1:
-    file1.write(str([time.time(), total_step, env.total_cost, env.exe_delay, env.tot_energy_cost, env.tot_off_cost]))
+    file1.write(str([MODEL_NAME, total_step, env.total_cost, env.exe_delay, env.tot_energy_cost, env.tot_off_cost]))
+    file1.write(str([env.off_decisions, env.off_from_edge]))
     file1.write("\n")
 # csv_writer(total_states)
 

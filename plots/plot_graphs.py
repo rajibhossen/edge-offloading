@@ -25,16 +25,17 @@ def draw_picture(filename):
 def plot_bars():
     fig = plt.figure()
     # ax = fig.add_axes([0, 0, 1, 1])
-    algo = ['DQN', 'Greedy', 'All Edge', 'All Mobile', 'All Cloud']
-    # algo = ['Mobile', 'edge', 'cloud']
+    algo = ['DQN', 'Greedy', 'All Edge', 'All Cloud', 'All Mobile']
+    #algo = ['DQN', 'Greedy', 'Edge']
     # total execution data
 
-    total_costs = [171046.9643922055, 166156.76108757418, 171522.4394385646, 359041.878701425, 189282.42264744863]
-    execution_delay = [246932.48422193376, 250630.36288031228, 254668.19884885458, 350457.72138229763,
-                       362504.1459842049]
-    total_energies = [68930.47869846618, 75408.20467287282, 69039.00180737283, 271427.4483558506, 91565.64354255877]
-    money = [2878.45051748448, 2977.367577309831, 3881.638791897804, 0, 709.0742608838378]
-
+    total_costs = [429670.37883146515, 452298.7344742455, 500532.29447798396, 528483.2751035696, 619828.6528771549]
+    execution_delay = [447816.17466608685, 497844.1190148968, 570329.0495467798, 662926.5163874701, 698609.8510763145]
+    total_energies = [168324.59753119622, 153661.51121530597, 137842.55751615335, 182884.62000866365, 270523.7273390044]
+    money = [3743.769396723148, 4971.5163751490045, 7752.5212188443675, 1413.539690116935, 0]
+    offloading_from_edge = [69.0 / 22668.0, 349 / 28561.0, 3711 / 40000.0]
+    # best offloading decision - {0: 11547, 1: 20472, 2: 7998}
+    # naive offloading decision - {0: 1722, 1: 27737, 2: 10543}
     # total_costs = [326249.3218534179, 621885.1697381499, 327568.9100616688, 454383.4887876519, 327164.0669541478]
     # execution_delay = [246932.48422193376, 350457.72138229763, 254652.81151009543, 362108.77098420705, 250630.36288031228]
     # total_energies = [75961.4927169943, 271427.4483558506, 69039.00180737283, 91565.64354255877, 73364.95670569877]
@@ -48,11 +49,12 @@ def plot_bars():
     # print(total_energies)
     # print(money)
     # print(total_costs)
-    plt.bar(algo, total_energies)
+    plt.bar(algo, money)
     plt.xlabel("Algorithms")
-    plt.ylabel("Average Energy Cost (J)")
-    plt.title("Average Energy Comparison of Algorithms")
-    plt.savefig("energy-cost-comparison.png")
+    plt.ylabel("execution delay (sec)")
+    # plt.ylabel("Average Energy Cost (J)")
+    plt.title("Average execution delay of Algorithms")
+    # plt.savefig("energy-cost-comparison.png")
     # plt.ylabel("Total Offloading Cost (USD)")
     # plt.title("Total Offloading Cost Comparison of Algorithms")
     # plt.savefig("off-price-compariso1.png")

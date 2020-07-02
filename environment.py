@@ -27,6 +27,7 @@ class Environment(gym.Env):
         self.tot_off_cost = 0
         self.total_cost = 0
         self.off_decisions = {0: 0, 1: 0, 2: 0}
+        self.off_from_edge = 0
 
     def render(self, mode='human'):
         pass
@@ -52,8 +53,8 @@ class Environment(gym.Env):
         if action == 0:  # local computing
             computing_cost, execution_delay, energy_used, off_price = m_total, m_time, m_energy, 0
         elif action == 1:  # offload to edge
-            edge = Edge(uplink_rate, server_cap)
-            computing_cost, execution_delay, energy_used, off_price = edge.cal_total_cost(data, cpu_cycle)
+            edge = Edge(uplink_rate, server_cap, self.off_from_edge)
+            computing_cost, execution_delay, energy_used, off_price, self.off_from_edge = edge.cal_total_cost(data, cpu_cycle)
         else:
             cloud = Cloud(uplink_rate)
             computing_cost, execution_delay, energy_used, off_price = cloud.cal_total_cost(data, cpu_cycle)

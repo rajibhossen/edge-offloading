@@ -3,7 +3,7 @@ import numpy as np
 import task
 
 
-# np.random.seed(1)
+np.random.seed(1)
 
 
 class Cloud:
@@ -34,13 +34,13 @@ class Cloud:
         tr_time = data / self.uplink_rate
         tr_time += tr_time  # from mobile to edge and then edge to cloud. so, transmit time is twice.
         tr_time += self.cal_propagation_delay()
-        tr_time += np.random.randint(5, 10)  # queuing delay
+        tr_time += np.random.randint(4, 8)  # queuing delay
         return tr_time
 
     def cal_transmit_from_edge(self, data):
         tr_time = data / self.uplink_rate
         tr_time += self.cal_propagation_delay()
-        # tr_time += np.random.randint(3, 4)  # queuing delay
+        tr_time += np.random.randint(15, 20)  # queuing delay
         return tr_time
 
     def cal_transmit_energy(self, data):
