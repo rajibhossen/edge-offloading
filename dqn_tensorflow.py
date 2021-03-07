@@ -12,14 +12,14 @@ import itertools
 
 # Exploration settings
 MAX_EPSILON = 1  # not a constant, going to be decayed
-EPSILON_DECAY = 0.99975
-MIN_EPSILON = 0.01
+EPSILON_DECAY = 0.9995
+MIN_EPSILON = 0.05
 GAMMA = 0.9
 LEARNING_RATE = 0.001
 MODEL_NAME = "DQN-TF"
-ep_rewards = [-1200]
-AGGREGATE_STATS_EVERY = 50  # episodes
-EPISODES = 40000
+ep_rewards = []
+AGGREGATE_STATS_EVERY = 10  # episodes
+EPISODES = 10000
 
 # For more repetitive results
 random.seed(1)
@@ -137,6 +137,14 @@ class GameRunner:
             state = np.asarray(state)
             tot_reward = 0
             max_x = -100
+
+            env.total_cost = 0
+            env.exe_delay = 0
+            env.tot_energy_cost = 0
+            env.tot_off_cost = 0
+            env.off_decisions = {0: 0, 1: 0, 2: 0}
+            env.off_from_edge = 0
+
             for step in itertools.count():
                 if self._render:
                     self._env.render()
@@ -158,9 +166,9 @@ class GameRunner:
 
                 # exponentially decay the eps value
                 self._steps += 1
-                if self._eps > MIN_EPSILON:
-                    self._eps *= EPSILON_DECAY
-                    self._eps = max(MIN_EPSILON, self._eps)
+                # if self._eps > MIN_EPSILON:
+                #     self._eps *= EPSILON_DECAY
+                #     self._eps = max(MIN_EPSILON, self._eps)
 
                 # self._eps = MIN_EPSILON + (MAX_EPSILON - MIN_EPSILON) * np.math.exp(-EPSILON_DECAY * self._steps)
 
@@ -173,6 +181,10 @@ class GameRunner:
                     self._reward_store.append(tot_reward)
                     self._max_x_store.append(max_x)
                     break
+
+            if self._eps > MIN_EPSILON:
+                self._eps *= EPSILON_DECAY
+                self._eps = max(MIN_EPSILON, self._eps)
 
             ep_rewards.append(tot_reward)
             if not episode % AGGREGATE_STATS_EVERY or episode == 1:
@@ -228,14 +240,14 @@ if __name__ == "__main__":
 
     num_states = 7
     num_actions = 3
-    num_episodes = 40000
+    num_episodes = 10000
 
     stats = plotting.EpisodeStats(
         episode_lengths=np.zeros(num_episodes),
         episode_rewards=np.zeros(num_episodes))
 
-    model = Model(num_states, num_actions, 1024)
-    mem = Memory(10000)
+    model = Model(num_states, num_actions, 128)
+    mem = Memory(100000)
 
     with tf.Session() as sess:
         sess.run(model._var_init)
@@ -249,10 +261,18 @@ if __name__ == "__main__":
         #         #     gr.run(cnt)
         #         #     cnt += 1
         gr.run()
-        plt.plot(gr._reward_store)
+        # saver = tf.train.Saver()
+        # saver.save(sess, "models/dqn_tf")
+        # plt.plot(gr._reward_store)
         # plt.show()
         # plt.close("all")
 
-        plotting.plot_episode_stats(stats, filename="dqn=tf-lr-0.0001-b1024-rm-10k")
+        print("Total Costs: ", env.total_cost)
+        print("Total Execution Time: ", env.exe_delay)
+        print("Total Energy cost: ", env.tot_energy_cost)
+        print("Total Money for offloading: ", env.tot_off_cost)
+        print("Offloading numbers", env.off_decisions)
+        print("offload from edge: ", env.off_from_edge)
+        # plotting.plot_episode_stats(stats, filename="dqn-tf-lr-0.0001-b1024-rm-10k")
         # plt.plot(gr._max_x_store)
         plt.show()

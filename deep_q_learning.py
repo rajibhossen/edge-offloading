@@ -10,10 +10,12 @@ from collections import deque
 
 import matplotlib.style
 import numpy as np
-from tensorflow.keras import Sequential
-from tensorflow.keras.layers import Dense
-from tensorflow.keras.optimizers import Adam
-from tensorflow.keras.utils import normalize
+import tensorflow as tf
+from keras.models import Sequential, load_model
+from keras.layers import Dense
+from keras.optimizers import Adam
+from keras.utils import normalize
+from keras.callbacks import TensorBoard
 
 from environment import Environment
 from lib import plotting
@@ -21,6 +23,39 @@ from lib import plotting
 matplotlib.style.use('ggplot')
 
 batch_size = 64
+
+
+# Own Tensorboard class
+class ModifiedTensorBoard(TensorBoard):
+
+    # Overriding init to set initial step and writer (we want one log file for all .fit() calls)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.step = 1
+        self.writer = tf.summary.FileWriter(self.log_dir)
+
+    # Overriding this method to stop creating default log writer
+    def set_model(self, model):
+        pass
+
+    # Overrided, saves logs with our step number
+    # (otherwise every .fit() will start writing from 0th step)
+    def on_epoch_end(self, epoch, logs=None):
+        self.update_stats(**logs)
+
+    # Overrided
+    # We train for one batch only, no need to save anything at epoch end
+    def on_batch_end(self, batch, logs=None):
+        pass
+
+    # Overrided, so won't close writer
+    def on_train_end(self, _):
+        pass
+
+    # Custom method for saving own metrics
+    # Creates writer, writes custom metrics and closes writer
+    def update_stats(self, **stats):
+        self._write_logs(stats, self.step)
 
 
 class DeepQLearning:
@@ -33,9 +68,11 @@ class DeepQLearning:
         self.epsilon = e_greedy
         self.optimizer = Adam(lr=0.001)
         self.experience_replay = deque(maxlen=100000)
-
-        self.q_network = self.build_compile_model()
-        self.target_network = self.build_compile_model()
+        self.tensorboard = ModifiedTensorBoard(log_dir='logs/temp_model')
+        # self.q_network = self.build_compile_model()
+        # self.target_network = self.build_compile_model()
+        self.q_network = load_model('models/temp_model.model')
+        self.target_network = load_model('models/temp_model.model')
         self.align_target_model()
 
     def build_compile_model(self):
@@ -78,7 +115,8 @@ class DeepQLearning:
         minibatch = random.sample(self.experience_replay, batch_size)
 
         for state, action, reward, n_state, terminated in minibatch:
-            target = self.q_network.predict(state)
+            # target = self.q_network.predict(state)
+            target = self.target_network.predict(state)
 
             if terminated:
                 target[0][action] = reward
@@ -86,7 +124,7 @@ class DeepQLearning:
                 t = self.q_network.predict(n_state)
                 target[0][action] = reward + self.discount * np.amax(t)
 
-            self.q_network.fit(state, target, epochs=1, verbose=0)
+            self.q_network.fit(state, target, epochs=1, verbose=0, callbacks=[self.tensorboard] if terminated else None)
 
 
 def update(env, DQL, episodes=1000):
@@ -126,7 +164,7 @@ def update(env, DQL, episodes=1000):
 
 
 if __name__ == '__main__':
-    num_of_episodes = 10000
+    num_of_episodes = 65
 
     env = Environment()
 
@@ -137,5 +175,5 @@ if __name__ == '__main__':
     DQL = DeepQLearning(actions=list(range(env.n_actions)), state_size=7)
 
     update(env, DQL, episodes=num_of_episodes)
-
+    DQL.q_network.save("models/temp_model.model")
     plotting.plot_episode_stats(stats)

@@ -19,7 +19,7 @@ def save_state_actions(data):
         csv_writer.writerow(data)
 
 
-def update(env, RL, episodes=1000):
+def update(env, RL, episodes=10000):
     ep_no = 1
     # state = env.reset()
     for episode in range(episodes):
@@ -55,7 +55,7 @@ def save_to_file(q_table):
 
 
 if __name__ == '__main__':
-    num_of_episodes = 5000
+    num_of_episodes = 1
 
     env = Environment()
 
@@ -68,6 +68,13 @@ if __name__ == '__main__':
     update(env, RL, episodes=num_of_episodes)
 
     plotting.plot_episode_stats(stats)
+
+    print("Total Costs:", env.total_cost)
+    print("Total Execution Time: ", env.exe_delay)
+    print("Total Energy cost: ", env.tot_energy_cost)
+    print("Total Money for offloading: ", env.tot_off_cost)
+    print("Offloading decisions: ", env.off_decisions)
+    print("offload from edge: ", env.off_from_edge)
 
     # shutil.copyfile("data/q_table.csv", "data/episodes-" + str(500) + ".csv")
     #

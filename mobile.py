@@ -8,7 +8,7 @@ class Mobile:
     def __init__(self, mobile_cap):
         self.esc = parameter["esc"]  # effective switched capacitance
         self.computing_capability = parameter['mobile_com_cap']
-        self.limited_capability = parameter['mobile_com_cap'] * mobile_cap
+        self.limited_capability = parameter['mobile_com_cap'] * (mobile_cap)
         self.w1 = parameter['w1']
         self.w2 = parameter['w2']
         self.w3 = parameter['w3']
@@ -44,7 +44,7 @@ if __name__ == '__main__':
     battery = Energy()
     exec_cost = 0
     tot_energy = 0
-    for i in range(100013):
+    for i in range(100000):
         state = get_next_state(state_gen, battery)
         mobile = Mobile(state[3])
         total, time, energy = mobile.calculate_total_cost(state[2])

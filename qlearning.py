@@ -10,7 +10,7 @@ import os
 
 
 class QLearningTable:
-    def __init__(self, actions, filename="", lr=0.01, discount=0.9, e_greedy=0.9):
+    def __init__(self, actions, filename="", lr=0.01, discount=0.9, e_greedy=0.99):
         self.actions = actions
         self.lr = lr
         self.discount = discount

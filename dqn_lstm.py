@@ -17,7 +17,7 @@ from keras.models import load_model
 from keras.optimizers import Adam, SGD, RMSprop
 from keras.utils import normalize
 from tqdm import tqdm
-
+import datetime
 from environment import Environment
 from lib import plotting
 
@@ -28,28 +28,26 @@ else:
     print("not in gpu")
 
 DISCOUNT = 0.90
-REPLAY_MEMORY_SIZE = 2000  # How many last steps to keep for model training
-MIN_REPLAY_MEMORY_SIZE = 1050  # Minimum number of steps in a memory to start training
-MINIBATCH_SIZE = 1024  # How many steps (samples) to use for training
+REPLAY_MEMORY_SIZE = 50000  # How many last steps to keep for model training
+MIN_REPLAY_MEMORY_SIZE = 129  # Minimum number of steps in a memory to start training
+MINIBATCH_SIZE = 128  # How many steps (samples) to use for training
 UPDATE_TARGET_EVERY = 50  # Terminal states (end of episodes)
-MODEL_NAME = 'dqn-lstm-rms-1e-3(40k)'
+MODEL_NAME = 'dqn_lstm_128_1e-6'
 MIN_REWARD = -500  # For model save
 MEMORY_FRACTION = 0.20
-LEARNING_RATE = 0.001
+LEARNING_RATE = 0.000001
 
 # Environment settings
-EPISODES = 10000
+EPISODES = 6000
 
 # Exploration settings
 epsilon = 1  # not a constant, going to be decayed
-EPSILON_DECAY = 0.999  # 0.99975
+EPSILON_DECAY = 0.9992  # 0.998, 0.99975,
 MIN_EPSILON = 0.05
 
 #  Stats settings
-AGGREGATE_STATS_EVERY = 50  # episodes
+AGGREGATE_STATS_EVERY = 10  # episodes
 SHOW_PREVIEW = False
-
-env = Environment()
 
 # For stats
 ep_rewards = [-1000]
@@ -63,17 +61,17 @@ tf.set_random_seed(1)
 # gpu_options = tf.GPUOptions(per_process_gpu_memory_fraction=MEMORY_FRACTION)
 # backend.set_session(tf.Session(config=tf.ConfigProto(gpu_options=gpu_options)))
 
-filename = "data/state-trace.csv"
-# Create models folder
-if not os.path.isdir('models'):
-    os.makedirs('models')
-
-
-def csv_writer(row):
-    with open(filename, 'a+') as file:
-        writer = csv.writer(file)
-        for item in row:
-            writer.writerow(eval(item))
+# filename = "data/state-trace.csv"
+# # Create models folder
+# if not os.path.isdir('models'):
+#     os.makedirs('models')
+#
+#
+# def csv_writer(row):
+#     with open(filename, 'a+') as file:
+#         writer = csv.writer(file)
+#         for item in row:
+#             writer.writerow(eval(item))
 
 
 # Own Tensorboard class
@@ -139,12 +137,15 @@ class DQNLSTMAgent:
     def create_model(self):
         model = Sequential()
 
-        model.add(Dense(500, activation='relu', input_shape=(1, 7)))
+        model.add(Dense(100, activation='relu', input_shape=(1, 7)))
         # model.add(Dense(50, activation='relu'))
         # model.add(Dense(50, activation='relu'))
         # model.add(LSTM(50, dropout=0.2, recurrent_dropout=0.2, return_sequences=True))
         model.add(LSTM(50, return_sequences=True))
         model.add(Dense(50, activation='relu'))
+
+        #model.add(Dense(3, activation='relu'))
+
         model.add(Dense(self.n_actions, activation='linear'))  # linear or softmax
         # model = model(states)
 
@@ -238,105 +239,118 @@ class DQNLSTMAgent:
         return predict
 
 
-# Main program starts here.
-agent = DQNLSTMAgent(7, 3)
-# print(agent.model.summary())
-# Iterate over episodes
+def driver_func():
+    global epsilon
+    # Main program starts here.
+    env = Environment()
+    agent = DQNLSTMAgent(7, 2)
+    # print(agent.model.summary())
+    # Iterate over episodes
 
-stats = plotting.EpisodeStats(
-    episode_lengths=np.zeros(EPISODES + 1),
-    episode_rewards=np.zeros(EPISODES + 1))
+    stats = plotting.EpisodeStats(
+        episode_lengths=np.zeros(EPISODES + 1),
+        episode_rewards=np.zeros(EPISODES + 1))
 
-# step_actions = []
-total_step = 1
-# total_states = []
-for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
+    # step_actions = []
+    total_step = 1
+    # total_states = []
+    new_time = 0
+    for episode in tqdm(range(1, EPISODES + 1), ascii=True, unit='episodes'):
 
-    # Update tensorboard step every episode
-    agent.tensorboard.step = episode
+        # Update tensorboard step every episode
+        agent.tensorboard.step = episode
 
-    # Restarting episode - reset episode reward and step number
-    episode_reward = 0
-    step = 1
+        # Restarting episode - reset episode reward and step number
+        episode_reward = 0
+        step = 1
 
-    # Reset environment and get initial state
-    current_state = env.reset()
-    current_state = np.asarray(current_state)
+        # Reset environment and get initial state
+        current_state = env.reset()
+        current_state = np.asarray(current_state)
 
-    current_state = normalize(current_state)
-    current_state = current_state.reshape(1, 7)
+        #current_state = normalize(current_state)
+        #current_state = current_state.reshape(1, 7)
 
-    # Reset flag and start iterating until episode ends
-    done = False
-    for t in itertools.count():
+        # Reset flag and start iterating until episode ends
+        # done = False
+        for t in itertools.count():
+            # This part stays mostly the same, the change is to query a model for Q values
+            if np.random.random() > epsilon:
+                # Get action from Q table
+                action = np.argmax(agent.get_qs(current_state))
+                # print(action)
+            else:
+                # Get random action
+                action = np.random.randint(0, env.n_actions)
 
-        # This part stays mostly the same, the change is to query a model for Q values
-        if np.random.random() > epsilon:
-            # Get action from Q table
-            action = np.argmax(agent.get_qs(current_state))
-            # print(action)
-        else:
-            # Get random action
-            action = np.random.randint(0, env.n_actions)
+            new_state, reward, done = env.step(action)
 
-        new_state, reward, done = env.step(action)
+            new_state = np.asarray(new_state)
+            #new_state = normalize(new_state)
+            #new_state = new_state.reshape(1, 7)
 
-        new_state = np.asarray(new_state)
-        new_state = normalize(new_state)
-        new_state = new_state.reshape(1, 7)
+            episode_reward += reward
 
-        episode_reward += reward
+            stats.episode_rewards[episode] += reward
+            stats.episode_lengths[episode] = t
 
-        stats.episode_rewards[episode] += reward
-        stats.episode_lengths[episode] = t
+            if SHOW_PREVIEW and not episode % AGGREGATE_STATS_EVERY:
+                env.render()
 
-        if SHOW_PREVIEW and not episode % AGGREGATE_STATS_EVERY:
-            env.render()
+            # Every step we update replay memory and train main network
+            agent.update_replay_memory((current_state, action, reward, new_state, done))
+            agent.train(done, step)
 
-        # Every step we update replay memory and train main network
-        agent.update_replay_memory((current_state, action, reward, new_state, done))
-        agent.train(done, step)
+            current_state = new_state
+            step += 1
+            total_step += 1
 
-        current_state = new_state
-        step += 1
-        total_step += 1
-        if done:
+            if done:
+                break
+
+        # Append episode reward to a list and log stats (every given number of episodes)
+        ep_rewards.append(episode_reward)
+        if not episode % AGGREGATE_STATS_EVERY or episode == 1:
+            average_reward = sum(ep_rewards[-AGGREGATE_STATS_EVERY:]) / len(ep_rewards[-AGGREGATE_STATS_EVERY:])
+            min_reward = min(ep_rewards[-AGGREGATE_STATS_EVERY:])
+            max_reward = max(ep_rewards[-AGGREGATE_STATS_EVERY:])
+            agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward,
+                                           epsilon=epsilon)
+
+            # # Save model, but only when min reward is greater or equal a set value
+            # if min_reward >= MIN_REWARD:
+            #     agent.model.save(f'models/{MODEL_NAME}.model')
+
+        # Decay epsilon
+        if epsilon > MIN_EPSILON:
+            # epsilon /= 3
+            epsilon *= EPSILON_DECAY
+            epsilon = max(MIN_EPSILON, epsilon)
+        # print(f"Step {total_step}/40000\n")
+        # iterate for 100k data, not just episode
+
+        if total_step >= 100000:
             break
 
-    # Append episode reward to a list and log stats (every given number of episodes)
-    ep_rewards.append(episode_reward)
-    if not episode % AGGREGATE_STATS_EVERY or episode == 1:
-        average_reward = sum(ep_rewards[-AGGREGATE_STATS_EVERY:]) / len(ep_rewards[-AGGREGATE_STATS_EVERY:])
-        min_reward = min(ep_rewards[-AGGREGATE_STATS_EVERY:])
-        max_reward = max(ep_rewards[-AGGREGATE_STATS_EVERY:])
-        agent.tensorboard.update_stats(reward_avg=average_reward, reward_min=min_reward, reward_max=max_reward,
-                                       epsilon=epsilon)
+    # print(new_time)
+    agent.model.save(f'models/{MODEL_NAME}.model')
+    print("Total Steps: ", total_step)
+    print("Total Costs:", env.total_cost)
+    print("Total Execution Time(S): ", env.exe_delay / 100000.0)
+    print("Total Transmission Time(S): ", env.trans_delay / 100000.0)
+    print("Total proc Energy cost(J): ", env.proc_energy / 100000.0)
+    print("Total Trans Energy cost(J): ", env.trans_energy / 100000.0)
+    print("Total Money for offloading(Cent): ", env.tot_off_cost / 1000.0)
+    print("Offloading numbers", env.off_decisions)
+    print("offload from edge: ", env.off_from_edge)
 
-        # # Save model, but only when min reward is greater or equal a set value
-        # if min_reward >= MIN_REWARD:
-        #     agent.model.save(f'models/{MODEL_NAME}.model')
+    # with open("data/iteration-costs.txt", "a+") as file1:
+    #     file1.write(str([MODEL_NAME, total_step, env.total_cost, env.exe_delay, env.tot_energy_cost, env.tot_off_cost]))
+    #     file1.write(str([env.off_decisions, env.off_from_edge]))
+    #     file1.write("\n")
+    # csv_writer(total_states)
 
-    # Decay epsilon
-    if epsilon > MIN_EPSILON:
-        epsilon /= 3
-        # epsilon *= EPSILON_DECAY
-        epsilon = max(MIN_EPSILON, epsilon)
-    print(f"Step {total_step}/100000\n")
-    # iterate for 100k data, not just episode
-    if total_step >= 40000:
-        break
+    # plotting.plot_episode_stats(stats, filename="dqn-lstm")
 
-agent.model.save(f'models/{MODEL_NAME}.model')
-print("Offloading numbers", env.off_decisions)
-print("Total Steps: ", total_step)
-print("Total Costs: ", env.total_cost)
-print("Total Execution Time: ", env.exe_delay)
-print("Total Energy cost: ", env.tot_energy_cost)
-print("Total Money for offloading: ", env.tot_off_cost)
-with open("data/iteration-costs.txt", "a+") as file1:
-    file1.write(str([MODEL_NAME, total_step, env.total_cost, env.exe_delay, env.tot_energy_cost, env.tot_off_cost]))
-    file1.write(str([env.off_decisions, env.off_from_edge]))
-    file1.write("\n")
-# csv_writer(total_states)
 
-plotting.plot_episode_stats(stats, filename="dqn-lstm")
+driver_func()

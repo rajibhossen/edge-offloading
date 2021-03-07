@@ -2,7 +2,6 @@ from system_parameters import parameter
 import numpy as np
 import task
 
-
 np.random.seed(1)
 
 
@@ -22,8 +21,9 @@ class Cloud:
         # delay = 0.25 # amazon us-east-1 average latency for a day. 250ms,
         # using normal distribution, mean = 250ms, std=448ms
         while True:
-            delay = np.random.randint(300, 500)
-            if delay < 0:
+            # delay = np.random.randint(300, 500)
+            delay = np.random.normal(250, 250)
+            if delay < 100:
                 continue
             else:
                 delay = delay / 1000.0
@@ -32,20 +32,20 @@ class Cloud:
 
     def cal_transmit_time(self, data):
         tr_time = data / self.uplink_rate
-        tr_time += tr_time  # from mobile to edge and then edge to cloud. so, transmit time is twice.
+        # tr_time += tr_time  # from mobile to edge and then edge to cloud. so, transmit time is twice.
         tr_time += self.cal_propagation_delay()
-        tr_time += np.random.randint(4, 8)  # queuing delay
+        # tr_time += 0.1  # 100ms added for miscellanious time
         return tr_time
 
     def cal_transmit_from_edge(self, data):
         tr_time = data / self.uplink_rate
         tr_time += self.cal_propagation_delay()
-        tr_time += np.random.randint(15, 20)  # queuing delay
+        tr_time += 0.2  # 100ms added for miscellanious time
         return tr_time
 
     def cal_transmit_energy(self, data):
         tr_time = data / self.uplink_rate
-        tr_energy = self.tr_power * tr_time + self.tail_latency_energy * 3
+        tr_energy = self.tr_power * tr_time + self.tail_latency_energy * 1.75
         return tr_energy
 
     def cal_processing_time(self, cpu_cycle):
@@ -63,7 +63,8 @@ class Cloud:
         money = self.cal_price(proc_time)
         time = tr_time + proc_time
         total = self.w1 * time + self.w2 * energy + self.w3 * money
-        return total, time, energy, money
+        #return total, time, energy, money
+        return total, tr_time, proc_time, energy, money
 
     def cal_total_cost_naive(self, data, cpu_cycle):
         tr_time = self.cal_transmit_time(data)
